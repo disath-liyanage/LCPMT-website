@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from "@/components/ui/button"
 
 export default async function AdminDashboard() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: { user }, error } = await supabase.auth.getUser()
 

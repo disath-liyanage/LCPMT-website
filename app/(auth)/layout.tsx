@@ -1,5 +1,11 @@
-export default function PlaceholderPage() {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div>Work in progress</div>
+    <div className="min-h-screen bg-muted/50 flex flex-col justify-center">
+      {children}
+    </div>
   );
 }
