@@ -1,0 +1,74 @@
+.about {
+  height: 500vh;
+  position: relative;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7rem clamp(1rem, 5vw, 3rem) 2rem;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 85rem; 
+}
+
+.paragraph {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(0.9rem, 1.8vw, 1.35rem);
+  line-height: 1.6;
+  text-align: center;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3em;
+}
+
+.word {
+  display: inline-flex;
+  flex-direction: column;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.word::after {
+  content: attr(data-word);
+  font-weight: 700;
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+.wordActive {
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .about {
+    height: 400vh;
+  }
+  .sticky {
+    height: 100dvh;
+    align-items: flex-start;
+    padding: 4.5rem 1rem 1rem; 
+  }
+  .textContainer {
+    gap: 0.75rem; 
+  }
+  .paragraph {
+    justify-content: flex-start;
+    font-size: clamp(0.7rem, 3.2vw, 0.9rem); 
+    line-height: 1.35; 
+  }
+}
