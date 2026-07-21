@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from "@/components/ui/button"
+import Link from 'next/link'
+import { buttonVariants } from "@/components/ui/button"
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -23,7 +24,9 @@ export default async function AdminDashboard() {
           </p>
         </div>
         
-        <Button>Add New Project</Button>
+        <Link href="/admin/new" className={buttonVariants({ variant: "default" })}>
+          Add New Project
+        </Link>
       </div>
 
       <div className="mt-8">
