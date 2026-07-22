@@ -7,6 +7,8 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+const BUCKET_NAME = 'project-images' 
+
 interface ImageUploaderProps {
   onUploadComplete?: (url: string) => void;
 }
@@ -30,7 +32,7 @@ export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) 
       const filePath = `projects/${fileName}`
 
       const { data, error } = await supabase.storage
-        .from('images')
+        .from(BUCKET_NAME) 
         .upload(filePath, file)
 
       if (error) {
@@ -41,7 +43,7 @@ export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) 
       }
 
       const { data: { publicUrl } } = supabase.storage
-        .from('images')
+        .from(BUCKET_NAME)
         .getPublicUrl(data.path)
       
       if (onUploadComplete) {
