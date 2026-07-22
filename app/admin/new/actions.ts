@@ -13,6 +13,8 @@ export async function createProject(formData: FormData) {
   const location = formData.get('location') as string
   const avenue = formData.get('avenue') as string
   const collaborative_club = formData.get('collaborative_club') as string
+  
+  const images = formData.getAll('images') as string[]
 
   const { error } = await supabase
     .from('projects')
@@ -24,6 +26,7 @@ export async function createProject(formData: FormData) {
         location,
         avenue,
         collaborative_club,
+        images
       }
     ])
 
@@ -34,6 +37,5 @@ export async function createProject(formData: FormData) {
 
   revalidatePath('/admin')
   revalidatePath('/projects')
-  
   redirect('/admin')
 }
