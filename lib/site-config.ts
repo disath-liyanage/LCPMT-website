@@ -11,6 +11,11 @@ export const siteConfig = {
   email: "info@titanleos.org",
   phone: "+94 77 000 0000",
   whatsapp: "+94770000000",
+    address: {
+    line1: "Pannipitiya",
+    line2: "Homagama DS Division, Colombo District",
+    country: "Sri Lanka",
+  },
 
   social: {
     facebook: "https://www.facebook.com/titanleos.sl",
