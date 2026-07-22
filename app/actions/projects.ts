@@ -50,3 +50,21 @@ export async function getProjects() {
     category: project.avenue, 
   }))
 }
+
+export async function deleteProject(id: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('projects')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error("Failed to delete project:", error.message)
+    throw new Error("Failed to delete project")
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/projects')
+  revalidatePath('/')
+}
