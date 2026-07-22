@@ -1,6 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 interface ImageUploaderProps {
   onUploadComplete?: (url: string) => void;
@@ -19,14 +24,32 @@ export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) 
     try {
       const objectUrl = URL.createObjectURL(file)
       setPreview(objectUrl)
-      
-      const fakeUploadedUrl = `https://your-supabase-project.supabase.co/storage/v1/object/public/images/${file.name}`
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2, 10)}_${Date.now()}.${fileExt}`
+      const filePath = `projects/${fileName}`
+
+      const { data, error } = await supabase.storage
+        .from('images')
+        .upload(filePath, file)
+
+      if (error) {
+        console.error("Supabase storage error:", error.message)
+        alert(`Upload failed: ${error.message}`)
+        setIsUploading(false)
+        return
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(data.path)
       
       if (onUploadComplete) {
-        onUploadComplete(fakeUploadedUrl)
+        onUploadComplete(publicUrl)
       }
     } catch (error) {
       console.error("Upload failed:", error)
+      alert("Something went wrong with the upload.")
     } finally {
       setIsUploading(false)
     }
@@ -43,7 +66,7 @@ export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) 
           onChange={handleFileChange}
           className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
         />
-        {isUploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+        {isUploading && <span className="text-sm font-bold text-blue-500 animate-pulse">Uploading to server...</span>}
       </div>
 
       {preview && (
