@@ -48,11 +48,32 @@ export async function getProjects() {
   return data.map(project => ({
     ...project,
     category: project.avenue, 
+    image: project.image_url,
   }))
 }
 
 export async function deleteProject(id: string) {
   const supabase = await createClient()
+
+  const { data: project } = await supabase
+    .from('projects')
+    .select('image_url')
+    .eq('id', id)
+    .single()
+
+  if (project?.image_url) {
+    const imagePath = project.image_url.split('/public/images/')[1]
+    
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage
+        .from('images')
+        .remove([imagePath])
+
+      if (storageError) {
+        console.error("Failed to delete image from bucket:", storageError.message)
+      }
+    }
+  }
 
   const { error } = await supabase
     .from('projects')
@@ -60,7 +81,7 @@ export async function deleteProject(id: string) {
     .eq('id', id)
 
   if (error) {
-    console.error("Failed to delete project:", error.message)
+    console.error("Failed to delete project row:", error.message)
     throw new Error("Failed to delete project")
   }
 
