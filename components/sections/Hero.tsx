@@ -7,7 +7,7 @@ import { impactStats } from "@/lib/data";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-primary">
+    <section id="hero" className="relative overflow-hidden bg-primary" >
       <div className="absolute inset-0">
         <Image
           src="/images/placeholders/hero-home.jpg"
