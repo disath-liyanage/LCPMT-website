@@ -1,6 +1,7 @@
 import { createProject } from './actions'
 import { Button, buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
+import ImageUploader from "@/components/ui/imageuploader"
 
 export default function NewProjectPage() {
   return (
@@ -51,6 +52,10 @@ export default function NewProjectPage() {
             <textarea id="description" name="description" rows={5} required className="w-full rounded-md border border-input bg-transparent px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
           </div>
 
+        </div>
+
+        <div className="pt-4 border-t border-border mt-6">
+          <ImageUploader />
         </div>
 
         <div className="flex justify-end pt-6 border-t border-border mt-8">
