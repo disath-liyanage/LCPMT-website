@@ -1,9 +1,14 @@
+"use client"
+
+import { useState } from "react"
 import { createProject } from './actions'
 import { Button, buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
 import ImageUploader from "@/components/ui/imageuploader"
 
 export default function NewProjectPage() {
+  const [imageUrl, setImageUrl] = useState<string>("")
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-8 flex items-center justify-between">
@@ -55,7 +60,8 @@ export default function NewProjectPage() {
         </div>
 
         <div className="pt-4 border-t border-border mt-6">
-          <ImageUploader />
+          <ImageUploader onUploadComplete={(url: string) => setImageUrl(url)} />
+          <input type="hidden" name="image_url" value={imageUrl} />
         </div>
 
         <div className="flex justify-end pt-6 border-t border-border mt-8">

@@ -1,88 +1,56 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react"
 
-export default function ImageUploader() {
-  const [uploading, setUploading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const supabase = createClient();
+interface ImageUploaderProps {
+  onUploadComplete?: (url: string) => void;
+}
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) {
+  const [preview, setPreview] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
-    setUploading(true);
-    const newUrls: string[] = [];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    for (const file of Array.from(files)) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `projects/${fileName}`;
+    setIsUploading(true)
 
-      const { error: uploadError } = await supabase.storage
-        .from('project-images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error("Upload failed:", uploadError.message);
-        alert(`Failed to upload ${file.name}`);
-        continue;
+    try {
+      const objectUrl = URL.createObjectURL(file)
+      setPreview(objectUrl)
+      
+      const fakeUploadedUrl = `https://your-supabase-project.supabase.co/storage/v1/object/public/images/${file.name}`
+      
+      if (onUploadComplete) {
+        onUploadComplete(fakeUploadedUrl)
       }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('project-images')
-        .getPublicUrl(filePath);
-
-      newUrls.push(publicUrl);
+    } catch (error) {
+      console.error("Upload failed:", error)
+    } finally {
+      setIsUploading(false)
     }
-
-    setImageUrls((prev) => [...prev, ...newUrls]);
-    setUploading(false);
-    
-    e.target.value = '';
-  };
-
-  const removeImage = (indexToRemove: number) => {
-    setImageUrls((prev) => prev.filter((_, index) => index !== indexToRemove));
-  };
+  }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Project Images</label>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleFileUpload}
-          disabled={uploading}
-          className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 disabled:opacity-50"
+    <div className="flex flex-col gap-4">
+      <label className="block text-sm font-medium mb-1">Project Image</label>
+      
+      <div className="flex items-center gap-4">
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleFileChange}
+          className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
         />
-        {uploading && <p className="text-sm mt-2 text-primary">Uploading images...</p>}
+        {isUploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
       </div>
 
-      {imageUrls.map((url, index) => (
-        <input key={index} type="hidden" name="images" value={url} />
-      ))}
-
-      {imageUrls.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {imageUrls.map((url, index) => (
-            <div key={index} className="relative group rounded-md overflow-hidden border border-border">
-              <img src={url} alt="Upload preview" className="h-24 w-full object-cover" />
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Remove image"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+      {preview && (
+        <div className="mt-2 relative w-40 h-40 rounded-lg overflow-hidden border border-border">
+          <img src={preview} alt="Preview" className="object-cover w-full h-full" />
         </div>
       )}
     </div>
-  );
+  )
 }
