@@ -12,36 +12,24 @@ export async function POST(request: Request) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return NextResponse.json(
-      { error: "Unauthorized. You must be logged in to send emails." },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
   const { to, subject, markdownBody } = body;
 
   if (!to?.trim() || !subject?.trim() || !markdownBody?.trim()) {
-    return NextResponse.json(
-      { error: "Recipient, subject, and message body are required." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "All fields are required." }, { status: 400 });
   }
 
   if (!resend) {
-    return NextResponse.json(
-      { error: "RESEND_API_KEY is not configured." },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "RESEND_API_KEY is not configured." }, { status: 503 });
   }
 
   try {
@@ -55,16 +43,18 @@ export async function POST(request: Request) {
       text: markdownBody, 
     });
 
-    if (data.error) {
-      throw new Error(data.error.message);
-    }
+    if (data.error) throw new Error(data.error.message);
 
-    return NextResponse.json({ success: true, id: data.data?.id });
+    const { error: dbError } = await supabase
+      .from('sent_emails')
+      .insert([
+        { recipient: to, subject: subject, body: markdownBody, status: "Sent" }
+      ]);
+
+    if (dbError) console.error("Failed to save email to db:", dbError);
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error("Failed to send admin email:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to send email." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
