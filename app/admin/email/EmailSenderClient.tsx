@@ -18,7 +18,7 @@ type SentMessage = {
 };
 
 const EmailPreviewShell = ({ markdownContent }: { markdownContent: string }) => (
-  <div className="w-full max-w-[600px] mx-auto bg-white text-black rounded-lg overflow-hidden shadow-lg border border-gray-200">
+  <div className="w-full max-w-[600px] mx-auto bg-white text-black rounded-lg overflow-hidden shadow-sm border border-gray-200">
     <div className="text-center pt-8 pb-4 bg-white">
       <img 
         src="/images/email.png" 
@@ -236,16 +236,31 @@ export default function EmailSenderClient({ initialHistory }: { initialHistory: 
 
       {viewingEmail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 sm:p-6">
-          
-          <button 
-            onClick={() => setViewingEmail(null)}
-            className="fixed top-6 right-6 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/20 dark:border-white/20 text-foreground hover:bg-black/20 dark:hover:bg-white/20 transition-all shadow-lg"
-          >
-            <X className="h-5 w-5" />
-          </button>
-
-          <div className="w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-xl">
-            <EmailPreviewShell markdownContent={viewingEmail.body} />
+          <div className="w-full max-w-[700px] flex flex-col max-h-[90vh] bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
+            
+            <div className="flex justify-between items-start p-5 sm:p-6 border-b border-border bg-muted/30">
+              <div className="pr-4">
+                <h3 className="text-xl font-bold leading-tight">{viewingEmail.subject}</h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Sent to: <span className="font-medium text-foreground">{viewingEmail.recipient}</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {new Date(viewingEmail.created_at).toLocaleString()}
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => setViewingEmail(null)}
+                className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 text-foreground hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            
+            <div className="overflow-y-auto p-4 sm:p-8 bg-black/5 dark:bg-black/40">
+              <EmailPreviewShell markdownContent={viewingEmail.body} />
+            </div>
+            
           </div>
         </div>
       )}
