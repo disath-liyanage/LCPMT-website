@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
   try {
     await resend.emails.send({
-      from: "Titan Leos <noteply@titanleos.org>",
+      from: "Titan Leos <noreply@titanleos.org>",
       to: siteConfig.email,
       replyTo: email,
       subject:
