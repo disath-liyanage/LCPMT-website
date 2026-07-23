@@ -3,10 +3,6 @@
 import { useState } from "react"
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
 const BUCKET_NAME = 'project-images'
 
 interface ImageUploaderProps {
@@ -16,6 +12,12 @@ interface ImageUploaderProps {
 export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+
+  const getSupabase = () => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+    return createClient(url, key)
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -31,8 +33,10 @@ export default function ImageUploader({ onUploadComplete }: ImageUploaderProps) 
       const fileName = `${Math.random().toString(36).substring(2, 10)}_${Date.now()}.${fileExt}`
       const filePath = `projects/${fileName}`
 
+      const supabase = getSupabase()
+
       const { data, error } = await supabase.storage
-        .from(BUCKET_NAME) 
+        .from(BUCKET_NAME)
         .upload(filePath, file)
 
       if (error) {
