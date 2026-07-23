@@ -21,7 +21,7 @@ function buildEmailTemplate(contentHtml: string) {
       
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         
-        <!-- CENTERED & MINIMIZED Header Image -->
+        <!-- Header Image -->
         <div style="text-align: center; padding: 30px 20px 10px 20px; background-color: #ffffff;">
           <img src="${SITE_URL}/images/email.png" alt="Titan Leos Header" style="max-width: 200px; height: auto; display: inline-block;" />
         </div>
@@ -34,16 +34,15 @@ function buildEmailTemplate(contentHtml: string) {
         <!-- Footer -->
         <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px 20px; text-align: center; font-size: 13px; color: #6b7280; line-height: 1.5;">
           
-          <!-- Colored Social Icons -->
           <div style="margin-bottom: 20px;">
             <a href="https://facebook.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://img.icons8.com/color/48/000000/facebook-new.png" width="32" height="32" alt="Facebook" style="display: block; border: none;" />
+              <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="28" height="28" alt="Facebook" style="display: block; border: none;" />
             </a>
             <a href="https://instagram.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://img.icons8.com/color/48/000000/instagram-new.png" width="32" height="32" alt="Instagram" style="display: block; border: none;" />
+              <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="28" height="28" alt="Instagram" style="display: block; border: none;" />
             </a>
             <a href="https://linkedin.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://img.icons8.com/color/48/000000/linkedin.png" width="32" height="32" alt="LinkedIn" style="display: block; border: none;" />
+              <img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" width="28" height="28" alt="LinkedIn" style="display: block; border: none;" />
             </a>
           </div>
           
@@ -93,6 +92,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    // The markdown body gets converted to HTML here, which inherently applies standard h1, h2 tags that email clients respect.
     const rawHtml = await marked.parse(markdownBody);
     const fullEmailHtml = buildEmailTemplate(rawHtml);
 
@@ -106,14 +106,12 @@ export async function POST(request: Request) {
 
     if (data.error) throw new Error(data.error.message);
 
-    // Save to Database
     const { error: dbError } = await supabase
       .from('sent_emails')
       .insert([{ recipient: to, subject: subject, body: markdownBody, status: "Sent" }]);
 
     if (dbError) {
       console.error("Database save failed:", dbError);
-      throw new Error(`Email sent, but failed to save to history: ${dbError.message}`);
     }
 
     return NextResponse.json({ success: true });
