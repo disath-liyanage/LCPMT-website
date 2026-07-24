@@ -23,7 +23,7 @@ function buildEmailTemplate(contentHtml: string) {
         
         <!-- Header Image -->
         <div style="text-align: center; padding: 30px 20px 10px 20px; background-color: #ffffff;">
-          <img src="${SITE_URL}/images/email.png" alt="Titan Leos Header" style="max-width: 200px; height: auto; display: inline-block;" />
+          <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 200px; height: auto; display: inline-block;" />
         </div>
         
         <!-- Body Content -->

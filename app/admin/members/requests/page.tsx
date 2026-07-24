@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, X, Trash2, Edit, Save, ArrowLeft, Loader2, MailCheck } from "lucide-react";
 
+const DISTRICTS = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
+
 const FIELD_LABELS: Record<string, string> = {
   member_type: "Member Type", previous_club: "Previous Club", lci_number: "LCI Number", is_inducted: "Inducted Before",
   full_name: "Full Name", name_initials: "Name with Initials", preferred_name: "Preferred Name", dob: "Date of Birth", gender: "Gender",
@@ -149,17 +151,6 @@ export default function MemberRequestsPage() {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
 
-  const EditInput = ({ label, name, type = "text", as = "input" }: any) => (
-    <div>
-      <label className="text-xs font-bold text-gray-500 mb-1 block">{label}</label>
-      {as === "textarea" ? (
-        <textarea name={name} value={editData[name]} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" rows={2} />
-      ) : (
-        <input type={type} name={name} value={editData[name] || ""} onChange={handleEditChange} className="w-full border rounded p-2 text-sm bg-white focus:ring-1 focus:ring-[#2D3F2B]" />
-      )}
-    </div>
-  );
-
   if (loading) return <div className="p-8 text-muted-foreground animate-pulse">Loading requests...</div>;
 
   return (
@@ -218,15 +209,15 @@ export default function MemberRequestsPage() {
 
       {approvalModal && (
         <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setApprovalModal(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="bg-emerald-600 px-6 py-4 flex justify-between items-center">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] shadow-2xl flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="bg-emerald-600 px-6 py-4 flex justify-between items-center shrink-0">
               <h2 className="text-lg font-bold text-white flex items-center">
                 <MailCheck className="w-5 h-5 mr-2" /> Finalize Approval
               </h2>
               <button onClick={() => setApprovalModal(null)} className="text-white/80 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
             
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 overflow-y-auto">
               <p className="text-sm text-gray-600">
                 You are approving <strong>{approvalModal.full_name}</strong>. An automated welcome email will be sent to <strong>{approvalModal.email}</strong>.
               </p>
@@ -254,7 +245,7 @@ export default function MemberRequestsPage() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-2 shrink-0">
                 <Button variant="outline" className="w-full" onClick={() => setApprovalModal(null)}>Cancel</Button>
                 <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={confirmApproval} disabled={isProcessing}>
                   {isProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
@@ -268,9 +259,9 @@ export default function MemberRequestsPage() {
 
       {selectedMember && !approvalModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => !isEditing && setSelectedMember(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col relative" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col relative" onClick={e => e.stopPropagation()}>
             
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center z-10 rounded-t-2xl">
+            <div className="bg-white/95 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center z-10 shrink-0">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900">
                   {isEditing ? "Edit Registration Details" : "Review Full Application"}
@@ -295,7 +286,7 @@ export default function MemberRequestsPage() {
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50/50">
+            <div className="p-6 bg-gray-50/50 overflow-y-auto">
               {!isEditing ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <DetailGroup title="Basics & Induction">
@@ -339,56 +330,75 @@ export default function MemberRequestsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">1. Basics</h3>
-                    <EditInput label="Member Type" name="member_type" />
-                    <EditInput label="Previous Club" name="previous_club" />
-                    <EditInput label="LCI Number" name="lci_number" />
-                    <EditInput label="Inducted Before" name="is_inducted" />
+                    <EditField label="Member Type" name="member_type" type="select" options={["new", "existing"]} value={editData.member_type} onChange={handleEditChange} />
+                    <EditField label="Previous Club" name="previous_club" value={editData.previous_club} onChange={handleEditChange} />
+                    <EditField label="LCI Number" name="lci_number" value={editData.lci_number} onChange={handleEditChange} />
+                    <EditField label="Inducted Before" name="is_inducted" type="select" options={["yes", "no"]} value={editData.is_inducted} onChange={handleEditChange} />
                   </div>
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">2. Personal</h3>
-                    <EditInput label="Full Name" name="full_name" />
-                    <EditInput label="Name w/ Initials" name="name_initials" />
-                    <EditInput label="Preferred Name" name="preferred_name" />
-                    <EditInput label="Date of Birth" name="dob" type="date" />
-                    <EditInput label="Gender" name="gender" />
-                    <EditInput label="NIC Number" name="nic" />
-                    <EditInput label="Current Status" name="current_status" />
+                    <EditField label="Full Name" name="full_name" value={editData.full_name} onChange={handleEditChange} />
+                    <EditField label="Name w/ Initials" name="name_initials" value={editData.name_initials} onChange={handleEditChange} />
+                    <EditField label="Preferred Name" name="preferred_name" value={editData.preferred_name} onChange={handleEditChange} />
+                    <EditField label="Date of Birth" name="dob" type="date" value={editData.dob} onChange={handleEditChange} />
+                    <EditField label="Gender" name="gender" type="select" options={["Male", "Female", "Other"]} value={editData.gender} onChange={handleEditChange} />
+                    <EditField label="NIC Number" name="nic" value={editData.nic} onChange={handleEditChange} />
+                    <EditField label="Current Status" name="current_status" type="select" options={["Student (School)", "Undergraduate", "Employed", "Other"]} value={editData.current_status} onChange={handleEditChange} />
                   </div>
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">3. Contact</h3>
-                    <EditInput label="WhatsApp" name="whatsapp" />
-                    <EditInput label="Email" name="email" type="email" />
-                    <EditInput label="Address" name="address" />
-                    <EditInput label="Street" name="street" />
-                    <EditInput label="City" name="city" />
-                    <EditInput label="District" name="district" />
-                    <EditInput label="Zip Code" name="zip_code" />
+                    <EditField label="WhatsApp" name="whatsapp" value={editData.whatsapp} onChange={handleEditChange} />
+                    <EditField label="Email" name="email" type="email" value={editData.email} onChange={handleEditChange} />
+                    <EditField label="Address" name="address" value={editData.address} onChange={handleEditChange} />
+                    <EditField label="Street" name="street" value={editData.street} onChange={handleEditChange} />
+                    <EditField label="City" name="city" value={editData.city} onChange={handleEditChange} />
+                    <EditField label="District" name="district" type="select" options={DISTRICTS} value={editData.district} onChange={handleEditChange} />
+                    <EditField label="Zip Code" name="zip_code" value={editData.zip_code} onChange={handleEditChange} />
                   </div>
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">4. Availability</h3>
-                    <EditInput label="Travel (Kottawa/Raj)" name="travel_availability" />
-                    <EditInput label="After 6 PM" name="after_6_availability" />
-                    <EditInput label="Weekends" name="weekend_availability" />
+                    <EditField label="Travel (Kottawa/Raj)" name="travel_availability" type="select" options={["Yes", "No", "Maybe"]} value={editData.travel_availability} onChange={handleEditChange} />
+                    <EditField label="After 6 PM" name="after_6_availability" type="select" options={["Yes", "No", "Sometimes"]} value={editData.after_6_availability} onChange={handleEditChange} />
+                    <EditField label="Weekends" name="weekend_availability" type="select" options={["Yes", "No", "Sometimes"]} value={editData.weekend_availability} onChange={handleEditChange} />
                   </div>
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">5. Committee</h3>
-                    <EditInput label="Interested?" name="committee_interest" />
-                    <EditInput label="Preference" name="committee_preference" />
-                    <EditInput label="Contribution" name="contribution_level" />
-                    <EditInput label="Parent Support" name="parent_support" />
-                    <EditInput label="Limitations" name="limitations" as="textarea" />
+                    <EditField label="Interested?" name="committee_interest" type="select" options={["Yes", "No", "Maybe later"]} value={editData.committee_interest} onChange={handleEditChange} />
+                    <EditField label="Preference" name="committee_preference" type="select" options={["Community Service", "Public Relations", "Finance/Fundraising", "Sports & Entertainment", "Membership & Leadership", "Other"]} value={editData.committee_preference} onChange={handleEditChange} />
+                    <EditField label="Contribution" name="contribution_level" type="select" options={["Highly Active", "Active", "Moderate"]} value={editData.contribution_level} onChange={handleEditChange} />
+                    <EditField label="Parent Support" name="parent_support" type="select" options={["Yes", "No", "Not Applicable"]} value={editData.parent_support} onChange={handleEditChange} />
+                    <EditField label="Limitations" name="limitations" type="textarea" value={editData.limitations} onChange={handleEditChange} />
                   </div>
                   <div className="space-y-4 bg-white p-5 rounded-xl border">
                     <h3 className="font-bold border-b pb-2 text-gray-800">6. Emergency</h3>
-                    <EditInput label="Contact Name" name="emergency_name" />
-                    <EditInput label="Relationship" name="emergency_relation" />
-                    <EditInput label="Phone Number" name="emergency_contact" />
+                    <EditField label="Contact Name" name="emergency_name" value={editData.emergency_name} onChange={handleEditChange} />
+                    <EditField label="Relationship" name="emergency_relation" value={editData.emergency_relation} onChange={handleEditChange} />
+                    <EditField label="Phone Number" name="emergency_contact" value={editData.emergency_contact} onChange={handleEditChange} />
                   </div>
                 </div>
               )}
             </div>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+
+function EditField({ label, name, type = "text", value, onChange, options = [] }: any) {
+  return (
+    <div>
+      <label className="text-xs font-bold text-gray-500 mb-1 block">{label}</label>
+      {type === "textarea" ? (
+        <textarea name={name} value={value || ""} onChange={onChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-[#2D3F2B] outline-none" rows={2} />
+      ) : type === "select" ? (
+        <select name={name} value={value || ""} onChange={onChange} className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-[#2D3F2B] outline-none">
+          <option value="">Select...</option>
+          {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+      ) : (
+        <input type={type} name={name} value={value || ""} onChange={onChange} className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-[#2D3F2B] outline-none" />
       )}
     </div>
   );
