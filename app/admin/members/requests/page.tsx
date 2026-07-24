@@ -113,7 +113,7 @@ export default function MemberRequestsPage() {
       : "";
 
     const waSection = `<div style="text-align: center; margin-top: 35px; margin-bottom: 20px;">
-        <a href="https://chat.whatsapp.com/YOUR_DUMMY_LINK_HERE" style="display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);">
+        <a href="https://chat.whatsapp.com/CNh61Xrknu2DnWoLUaFgY3" style="display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);">
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="22" style="vertical-align: middle; margin-right: 10px;"/> 
           Join the Member WhatsApp Group
         </a>
