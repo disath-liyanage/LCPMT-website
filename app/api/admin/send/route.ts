@@ -22,42 +22,43 @@ function buildEmailTemplate(contentHtml: string) {
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         
         <!-- Header Image -->
-        <div style="text-align: center; padding: 30px 20px 10px 20px; background-color: #ffffff;">
-          <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 200px; height: auto; display: inline-block;" />
+        <div style="text-align: center; padding: 40px 20px 10px 20px; background-color: #ffffff;">
+          <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
         </div>
         
         <!-- Body Content -->
-        <div style="padding: 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a;">
+        <div style="padding: 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a; background-color: #ffffff;">
           ${contentHtml}
         </div>
         
-        <!-- Footer -->
-        <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px 20px; text-align: center; font-size: 13px; color: #6b7280; line-height: 1.5;">
+        <!-- Footer (Seamless Unified Background) -->
+        <div style="background-color: #ffffff; padding: 10px 40px 40px 40px; text-align: center; font-size: 13px; line-height: 1.5;">
           
-          <div style="margin-bottom: 20px;">
-            <a href="https://facebook.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="28" height="28" alt="Facebook" style="display: block; border: none;" />
+          <!-- Social Icons (Larger & Cleaner) -->
+          <div style="margin-bottom: 24px;">
+            <a href="https://www.facebook.com/titanleos.sl" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384053.png" width="34" height="34" alt="Facebook" style="display: block; border: none; opacity: 0.85;" />
             </a>
-            <a href="https://instagram.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="28" height="28" alt="Instagram" style="display: block; border: none;" />
+            <a href="https://www.instagram.com/titan_leos" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" width="34" height="34" alt="Instagram" style="display: block; border: none; opacity: 0.85;" />
             </a>
-            <a href="https://linkedin.com" style="text-decoration: none; margin: 0 10px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" width="28" height="28" alt="LinkedIn" style="display: block; border: none;" />
+            <a href="https://www.linkedin.com/in/titanleos/" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384014.png" width="34" height="34" alt="LinkedIn" style="display: block; border: none; opacity: 0.85;" />
             </a>
           </div>
           
-          <div style="margin-bottom: 15px;">
-            <a href="mailto:info@titanleos.org" style="color: #2563eb; text-decoration: none;">info@titanleos.org</a> | 
-            <a href="https://titanleos.org" style="color: #2563eb; text-decoration: none;">https://titanleos.org</a>
+          <!-- Contact Info -->
+          <div style="margin-bottom: 12px; font-weight: bold; font-size: 14px;">
+            <a href="mailto:info@titanleos.org" style="color: #2563eb; text-decoration: none;">info@titanleos.org</a> 
+            <span style="margin: 0 8px; color: #2563eb; font-weight: bold;">&bull;</span> 
+            <a href="https://www.titanleos.org" style="color: #2563eb; text-decoration: none;">www.titanleos.org</a>
           </div>
           
-          <div style="margin-bottom: 15px;">
+          <!-- Copyright -->
+          <div style="font-weight: bold; color: #4b5563;">
             &copy; Leo Club of Pannipitiya Metro Titans 2026. All rights reserved.
           </div>
           
-          <div>
-            <a href="${SITE_URL}/unsubscribe" style="color: #6b7280; text-decoration: underline;">Unsubscribe from marketing emails</a>
-          </div>
         </div>
         
       </div>
@@ -68,16 +69,6 @@ function buildEmailTemplate(contentHtml: string) {
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  
-  // WARNING: Auth is commented out so it works during development.
-  // Restore this once your admin login system is fully built.
-  /*
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-  */
-
   let body;
   try {
     body = await request.json();
@@ -100,7 +91,7 @@ export async function POST(request: Request) {
     const fullEmailHtml = buildEmailTemplate(rawHtml);
 
     const data = await resend.emails.send({
-      from: "Titan Leos <hello@titanleos.org>", // Changed to hello@
+      from: "Titan Leos <hello@titanleos.org>",
       to: to,
       subject: subject,
       html: fullEmailHtml,
