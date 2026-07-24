@@ -245,9 +245,9 @@ export default function MemberRequestsPage() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2 shrink-0">
-                <Button variant="outline" className="w-full" onClick={() => setApprovalModal(null)}>Cancel</Button>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={confirmApproval} disabled={isProcessing}>
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 shrink-0">
+                <Button variant="outline" className="flex-1" onClick={() => setApprovalModal(null)}>Cancel</Button>
+                <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700" onClick={confirmApproval} disabled={isProcessing}>
                   {isProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
                   Approve & Send Email
                 </Button>
