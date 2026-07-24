@@ -22,16 +22,13 @@ const FIELD_LABELS: Record<string, string> = {
 export default function MemberRequestsPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const [selectedMember, setSelectedMember] = useState<any | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
-  
   const [approvalModal, setApprovalModal] = useState<any | null>(null);
   const [lciInput, setLciInput] = useState("");
   const [automatedNotes, setAutomatedNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  
   const supabase = createClient();
 
   const fetchPending = async () => {
@@ -70,7 +67,6 @@ export default function MemberRequestsPage() {
 
   const handleSaveAndApprove = async () => {
     const changes: string[] = [];
-    
     Object.keys(FIELD_LABELS).forEach(key => {
       if (selectedMember[key] !== editData[key]) {
         changes.push(`- **${FIELD_LABELS[key]}**: updated to *${editData[key] || "N/A"}*`);
@@ -86,7 +82,6 @@ export default function MemberRequestsPage() {
       alert("Failed to save edits to database.");
       return;
     }
-    
     setIsEditing(false);
     openApprovalFlow(editData, generatedNotes);
   };
@@ -107,13 +102,13 @@ export default function MemberRequestsPage() {
 
     const lciSection = approvalModal.member_type === 'new'
       ? `<br><div style="text-align: center; border: 2px dashed #2D3F2B; padding: 20px; margin: 20px auto; border-radius: 12px; max-width: 320px; background-color: #F8FAFC;">
-           <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #556B52; margin-bottom: 5px;">Your Official LCI Number</div>
-           <div style="font-size: 32px; font-weight: 800; color: #2D3F2B; letter-spacing: 2px;">${lciInput}</div>
-         </div>`
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #556B52; margin-bottom: 5px;">Your Official LCI Number</div>
+            <div style="font-size: 32px; font-weight: 800; color: #2D3F2B; letter-spacing: 2px;">${lciInput}</div>
+          </div>`
       : "";
 
     const waSection = `<div style="text-align: center; margin-top: 35px; margin-bottom: 20px;">
-        <a href="https://chat.whatsapp.com/CNh61Xrknu2DnWoLUaFgY3" style="display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);">
+        <a href="https://chat.whatsapp.com/CNh61Xrknu2DnWoLUaFgY3" class="wa-btn" style="display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 16px; border: 2px solid #25D366;">
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="22" style="vertical-align: middle; margin-right: 10px;"/> 
           Join the Member WhatsApp Group
         </a>
@@ -164,7 +159,6 @@ export default function MemberRequestsPage() {
           <p className="text-muted-foreground mt-1">Review new applications waiting for approval.</p>
         </div>
       </div>
-      
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-50/80 border-b">
@@ -216,7 +210,6 @@ export default function MemberRequestsPage() {
               </h2>
               <button onClick={() => setApprovalModal(null)} className="text-white/80 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
-            
             <div className="p-6 space-y-6 overflow-y-auto">
               <p className="text-sm text-gray-600">
                 You are approving <strong>{approvalModal.full_name}</strong>. An automated welcome email will be sent to <strong>{approvalModal.email}</strong>.
@@ -260,7 +253,6 @@ export default function MemberRequestsPage() {
       {selectedMember && !approvalModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => !isEditing && setSelectedMember(null)}>
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col relative" onClick={e => e.stopPropagation()}>
-            
             <div className="bg-white/95 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center z-10 shrink-0">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -268,7 +260,6 @@ export default function MemberRequestsPage() {
                 </h2>
                 {!isEditing && <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">Pending</span>}
               </div>
-              
               <div className="flex gap-2">
                 {!isEditing ? (
                   <>
@@ -384,7 +375,6 @@ export default function MemberRequestsPage() {
     </div>
   );
 }
-
 
 function EditField({ label, name, type = "text", value, onChange, options = [] }: any) {
   return (
