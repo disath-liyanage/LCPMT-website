@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button"; 
-import { LayoutDashboard, Mail, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Mail, LogOut, Home, Users, } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -31,6 +31,14 @@ export default function AdminLayout({
             Email Sender
           </Link>
         </nav>
+
+        <Link 
+            href="/admin/members" 
+            className={buttonVariants({ variant: "ghost", className: "justify-start" })}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Members & Approvals
+          </Link>
 
         <div className="p-4 border-t border-border flex flex-col gap-2">
           <Link 

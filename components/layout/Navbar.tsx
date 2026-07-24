@@ -176,7 +176,7 @@ export default function Navbar() {
 
         <div className="shrink-0 z-10">
           <Link
-            href="/#join"
+            href="/join"
             className="inline-flex whitespace-nowrap rounded-full border border-[#2D3F2B] px-4 py-1.5 sm:px-5 sm:py-2 text-[13px] sm:text-sm font-semibold text-[#2D3F2B] transition-all duration-200 hover:bg-[#2D3F2B] hover:text-[#F5F0E8] active:scale-95"
           >
             Join Us
