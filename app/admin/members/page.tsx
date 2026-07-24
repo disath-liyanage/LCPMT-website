@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Check, X, Trash2, Edit, Save, Bell } from "lucide-react";
+import { X, Trash2, Bell } from "lucide-react";
 
 export default function MembersAdminPage() {
   const [members, setMembers] = useState<any[]>([]);
@@ -12,9 +12,6 @@ export default function MembersAdminPage() {
   const [loading, setLoading] = useState(true);
   
   const [selectedMember, setSelectedMember] = useState<any | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<any>(null);
-  
   const supabase = createClient();
 
   const fetchData = async () => {
@@ -33,7 +30,6 @@ export default function MembersAdminPage() {
       .eq("status", "pending");
       
     if (count !== null) setPendingCount(count);
-    
     setLoading(false);
   };
 
@@ -41,33 +37,21 @@ export default function MembersAdminPage() {
     fetchData();
   }, []);
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") setSelectedMember(null);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   const deleteMember = async (id: string) => {
-    if (!confirm("Are you sure you want to completely delete this member?")) return;
+    if (!confirm("Are you sure you want to completely remove this member?")) return;
     const { error } = await supabase.from("members").delete().eq("id", id);
     if (!error) {
       setSelectedMember(null);
       fetchData();
-    } else {
-      alert("Failed to delete.");
-    }
-  };
-
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setEditData({ ...editData, [e.target.name]: e.target.value });
-  };
-
-  const saveEdit = async () => {
-    const { error } = await supabase
-      .from("members")
-      .update(editData)
-      .eq("id", editData.id);
-      
-    if (!error) {
-      setIsEditing(false);
-      setSelectedMember(editData);
-      fetchData();
-    } else {
-      alert("Failed to update.");
     }
   };
 
@@ -111,12 +95,12 @@ export default function MembersAdminPage() {
             {members.map((member) => (
               <tr 
                 key={member.id} 
-                onClick={() => { setSelectedMember(member); setEditData(member); setIsEditing(false); }}
+                onClick={() => setSelectedMember(member)}
                 className="hover:bg-gray-50/80 transition-colors cursor-pointer"
               >
                 <td className="px-6 py-4">
                   <div className="font-medium text-gray-900">{member.full_name}</div>
-                  <div className="text-gray-500 text-xs mt-0.5">{member.member_type === 'existing' ? `LCI: ${member.lci_number}` : 'New Member'}</div>
+                  <div className="text-gray-500 text-xs mt-0.5">{member.member_type === 'existing' ? `LCI: ${member.lci_number}` : 'New Member (LCI: ' + (member.lci_number || 'N/A') + ')'}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-gray-900">{member.whatsapp}</div>
@@ -131,82 +115,68 @@ export default function MembersAdminPage() {
       </div>
 
       {selectedMember && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col relative">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedMember(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col relative" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center z-10 rounded-t-2xl">
-              <h2 className="text-xl font-bold text-gray-900">
-                {isEditing ? "Edit Member" : "Member Details"}
+              <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                Member Details <span className="ml-3 bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">Approved</span>
               </h2>
               <div className="flex gap-2">
-                {!isEditing ? (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}><Edit className="w-4 h-4 mr-2" /> Edit</Button>
-                    <Button variant="destructive" size="sm" onClick={() => deleteMember(selectedMember.id)}><Trash2 className="w-4 h-4 mr-2" /> Delete</Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
-                    <Button className="bg-[#2D3F2B]" size="sm" onClick={saveEdit}><Save className="w-4 h-4 mr-2" /> Save</Button>
-                  </>
-                )}
+                <Button variant="destructive" size="sm" onClick={() => deleteMember(selectedMember.id)}><Trash2 className="w-4 h-4 mr-2" /> Revoke Membership</Button>
                 <Button variant="ghost" size="icon" onClick={() => setSelectedMember(null)}><X className="w-5 h-5 text-gray-500" /></Button>
               </div>
             </div>
 
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {!isEditing ? (
-                <>
-                  <DetailGroup title="Personal Info">
-                    <InfoRow label="Full Name" value={selectedMember.full_name} />
-                    <InfoRow label="Preferred Name" value={selectedMember.preferred_name} />
-                    <InfoRow label="DOB" value={selectedMember.dob} />
-                    <InfoRow label="Gender" value={selectedMember.gender} />
-                    <InfoRow label="NIC" value={selectedMember.nic} />
-                  </DetailGroup>
-                  <DetailGroup title="Contact & Location">
-                    <InfoRow label="WhatsApp" value={selectedMember.whatsapp} />
-                    <InfoRow label="Email" value={selectedMember.email} />
-                    <InfoRow label="District" value={selectedMember.district} />
-                    <InfoRow label="Address" value={`${selectedMember.street}, ${selectedMember.city}`} />
-                  </DetailGroup>
-                  <DetailGroup title="Club Details">
-                    <InfoRow label="Type" value={selectedMember.member_type} />
-                    {selectedMember.member_type === 'existing' && (
-                      <InfoRow label="Previous Club" value={selectedMember.previous_club} />
-                    )}
-                    <InfoRow label="Committee Pref" value={selectedMember.committee_preference} />
-                    <InfoRow label="Contribution" value={selectedMember.contribution_level} />
-                  </DetailGroup>
-                  <DetailGroup title="Emergency Contact">
-                    <InfoRow label="Name" value={selectedMember.emergency_name} />
-                    <InfoRow label="Relation" value={selectedMember.emergency_relation} />
-                    <InfoRow label="Contact" value={selectedMember.emergency_contact} />
-                  </DetailGroup>
-                </>
-              ) : (
-                <>
-                  <div className="space-y-4">
-                    <h3 className="font-bold border-b pb-2">Personal Info</h3>
-                    <div><label className="text-xs font-bold text-gray-500">Full Name</label><input name="full_name" value={editData.full_name} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                    <div><label className="text-xs font-bold text-gray-500">WhatsApp</label><input name="whatsapp" value={editData.whatsapp} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                    <div><label className="text-xs font-bold text-gray-500">Email</label><input name="email" value={editData.email} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                    <div><label className="text-xs font-bold text-gray-500">District</label><input name="district" value={editData.district} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="font-bold border-b pb-2">Club Settings</h3>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500">Status</label>
-                      <select name="status" value={editData.status} onChange={handleEditChange} className="w-full border rounded p-2 text-sm">
-                        <option value="approved">Approved</option>
-                        <option value="pending">Pending</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                    </div>
-                    <div><label className="text-xs font-bold text-gray-500">Committee Pref</label><input name="committee_preference" value={editData.committee_preference} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                    <div><label className="text-xs font-bold text-gray-500">Limitations</label><input name="limitations" value={editData.limitations} onChange={handleEditChange} className="w-full border rounded p-2 text-sm" /></div>
-                  </div>
-                </>
-              )}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <DetailGroup title="Basics & Induction">
+                  <InfoRow label="Member Type" value={selectedMember.member_type} />
+                  <InfoRow label="Official LCI Number" value={selectedMember.lci_number} />
+                  {selectedMember.member_type === 'existing' && (
+                    <InfoRow label="Previous Club" value={selectedMember.previous_club} />
+                  )}
+                  <InfoRow label="Inducted Before?" value={selectedMember.is_inducted} />
+                </DetailGroup>
+                
+                <DetailGroup title="Personal Information">
+                  <InfoRow label="Full Name" value={selectedMember.full_name} />
+                  <InfoRow label="Name with Initials" value={selectedMember.name_initials} />
+                  <InfoRow label="Preferred Name" value={selectedMember.preferred_name} />
+                  <InfoRow label="Date of Birth" value={selectedMember.dob} />
+                  <InfoRow label="Gender" value={selectedMember.gender} />
+                  <InfoRow label="NIC Number" value={selectedMember.nic} />
+                  <InfoRow label="Current Status" value={selectedMember.current_status} />
+                </DetailGroup>
+
+                <DetailGroup title="Contact & Location">
+                  <InfoRow label="WhatsApp Number" value={selectedMember.whatsapp} />
+                  <InfoRow label="Email Address" value={selectedMember.email} />
+                  <InfoRow label="Address" value={selectedMember.address} />
+                  <InfoRow label="Street" value={selectedMember.street} />
+                  <InfoRow label="City" value={selectedMember.city} />
+                  <InfoRow label="District" value={selectedMember.district} />
+                  <InfoRow label="Zip Code" value={selectedMember.zip_code} />
+                </DetailGroup>
+
+                <DetailGroup title="Availability & Logistics">
+                  <InfoRow label="Can travel to Kottawa/Rajagiriya?" value={selectedMember.travel_availability} />
+                  <InfoRow label="Available after 6 PM?" value={selectedMember.after_6_availability} />
+                  <InfoRow label="Available on weekends?" value={selectedMember.weekend_availability} />
+                </DetailGroup>
+
+                <DetailGroup title="Committee & Contribution">
+                  <InfoRow label="Committee Assigned" value={selectedMember.committee_preference} />
+                  <InfoRow label="Expected Contribution" value={selectedMember.contribution_level} />
+                  <InfoRow label="Parents/Guardians Supportive?" value={selectedMember.parent_support} />
+                  <InfoRow label="Limitations" value={selectedMember.limitations} />
+                </DetailGroup>
+
+                <DetailGroup title="Emergency Contact">
+                  <InfoRow label="Contact Name" value={selectedMember.emergency_name} />
+                  <InfoRow label="Relationship" value={selectedMember.emergency_relation} />
+                  <InfoRow label="Phone Number" value={selectedMember.emergency_contact} />
+                </DetailGroup>
+              </div>
             </div>
           </div>
         </div>
@@ -217,8 +187,8 @@ export default function MembersAdminPage() {
 
 function DetailGroup({ title, children }: { title: string, children: React.ReactNode }) {
   return (
-    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-      <h3 className="font-bold text-[#2D3F2B] mb-3 text-sm uppercase tracking-wider">{title}</h3>
+    <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm h-full">
+      <h3 className="font-bold text-[#2D3F2B] mb-4 text-xs uppercase tracking-widest border-b border-gray-200 pb-2">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -227,8 +197,8 @@ function DetailGroup({ title, children }: { title: string, children: React.React
 function InfoRow({ label, value }: { label: string, value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs font-semibold text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value || "N/A"}</span>
+      <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{label}</span>
+      <span className="text-sm font-medium text-gray-900 mt-0.5">{value || "N/A"}</span>
     </div>
   );
 }
