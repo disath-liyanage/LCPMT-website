@@ -30,15 +30,15 @@ export default function AdminLayout({
             <Mail className="mr-2 h-4 w-4" />
             Email Sender
           </Link>
-        </nav>
 
-        <Link 
+           <Link 
             href="/admin/members" 
             className={buttonVariants({ variant: "ghost", className: "justify-start" })}
           >
             <Users className="mr-2 h-4 w-4" />
             Members & Approvals
           </Link>
+        </nav>
 
         <div className="p-4 border-t border-border flex flex-col gap-2">
           <Link 
