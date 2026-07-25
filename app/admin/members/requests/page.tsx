@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, X, Trash2, Edit, Save, ArrowLeft, Loader2, MailCheck } from "lucide-react";
+import { Check, X, Trash2, Edit, Save, ArrowLeft, Loader2, MailCheck, Eye } from "lucide-react";
 
 const DISTRICTS = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
@@ -26,6 +26,7 @@ export default function MemberRequestsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
   const [approvalModal, setApprovalModal] = useState<any | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const [lciInput, setLciInput] = useState("");
   const [automatedNotes, setAutomatedNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -50,6 +51,7 @@ export default function MemberRequestsPage() {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") {
       setApprovalModal(null);
+      setShowPreview(false);
       if (!isEditing) setSelectedMember(null);
     }
   }, [isEditing]);
@@ -146,6 +148,87 @@ export default function MemberRequestsPage() {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
 
+  const generatePreviewHtml = () => {
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://titanleos.org";
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+      <style>
+        @media only screen and (max-width: 600px) {
+          .email-container { width: 100% !important; border-radius: 0 !important; }
+          .header-img-container { padding: 25px 15px 0px 15px !important; }
+          .body-content { padding: 15px 20px !important; font-size: 15px !important; }
+          .body-content h1 { font-size: 22px !important; margin-top: 0 !important; margin-bottom: 15px !important; }
+          .footer-content { padding: 10px 20px 30px 20px !important; }
+        }
+        .body-content h1 { margin-top: 0; font-size: 26px; color: #1a1a1a; }
+        @keyframes wa-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6); }
+          70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        .wa-btn { animation: wa-pulse 2s infinite; }
+      </style>
+      </head>
+      <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; -webkit-font-smoothing: antialiased;">
+      <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div class="header-img-container" style="text-align: center; padding: 35px 20px 0px 20px; background-color: #ffffff;">
+          <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
+        </div>
+        <div class="body-content" style="padding: 20px 40px 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a; background-color: #ffffff;">
+          <h1 style="margin-top: 0; font-size: 26px; color: #1a1a1a;">Congratulations, John Doe! 🎉</h1>
+          <p>Welcome to the Leo Club of Pannipitiya Metro Titans!</p>
+          <p>Your membership application for the Leoistic Year 2026/27 has been officially <strong>approved</strong>. We are thrilled to have you on board as an active Titan.</p>
+          <br>
+          <div style="text-align: center; border: 2px dashed #2D3F2B; padding: 20px; margin: 20px auto; border-radius: 12px; max-width: 320px; background-color: #F8FAFC;">
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #556B52; margin-bottom: 5px;">Your Official LCI Number</div>
+            <div style="font-size: 32px; font-weight: 800; color: #2D3F2B; letter-spacing: 2px;">9876543</div>
+          </div>
+          <br>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <h4 style="margin: 0 0 10px 0; font-size: 12px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Important Updates to Your Application</h4>
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #475569;">Our team has made the following adjustments to your registration details:</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #1e293b;">
+              <li><strong>Name with Initials</strong>: updated to <em>J. Doe</em></li>
+              <li><strong>WhatsApp Number</strong>: updated to <em>0771234567</em></li>
+            </ul>
+          </div>
+          <div style="text-align: center; margin-top: 35px; margin-bottom: 20px;">
+            <a href="#" class="wa-btn" style="display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 16px; border: 2px solid #25D366;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="22" style="vertical-align: middle; margin-right: 10px;"/> 
+              Join the Member WhatsApp Group
+            </a>
+          </div>
+          <p>Keep an eye on the WhatsApp group and this email for updates regarding upcoming projects and meetings.</p>
+          <p>Best regards,<br>Board of Directors<br><strong>Leo Club of Pannipitiya Metro Titans</strong></p>
+        </div>
+        <div class="footer-content" style="background-color: #ffffff; padding: 10px 40px 40px 40px; text-align: center; font-size: 13px; line-height: 1.5;">
+          <!-- Prettier Social Icons -->
+          <div style="margin-bottom: 24px;">
+            <a href="#" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://img.icons8.com/fluency/48/facebook-new.png" width="36" height="36" alt="Facebook" style="display: block; border: none;" />
+            </a>
+            <a href="#" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://img.icons8.com/fluency/48/instagram-new.png" width="36" height="36" alt="Instagram" style="display: block; border: none;" />
+            </a>
+            <a href="#" style="text-decoration: none; margin: 0 12px; display: inline-block;">
+              <img src="https://img.icons8.com/fluency/48/linkedin.png" width="36" height="36" alt="LinkedIn" style="display: block; border: none;" />
+            </a>
+          </div>
+          <div style="margin-bottom: 12px; font-weight: bold; font-size: 14px;">
+            <a href="#" style="color: #2563eb; text-decoration: none;">info@titanleos.org</a>&nbsp;
+            <span style="margin: 0 8px; color: #2563eb; font-weight: bold;">&bull;</span>&nbsp;
+            <a href="#" style="color: #2563eb; text-decoration: none;">www.titanleos.org</a>
+          </div>
+          <div style="font-weight: bold; color: #4b5563;">&copy; Leo Club of Pannipitiya Metro Titans 2026. All rights reserved.</div>
+        </div>
+      </div>
+      </body>
+      </html>
+    `;
+  };
+
   if (loading) return <div className="p-8 text-muted-foreground animate-pulse">Loading requests...</div>;
 
   return (
@@ -158,7 +241,12 @@ export default function MemberRequestsPage() {
           </div>
           <p className="text-muted-foreground mt-1">Review new applications waiting for approval.</p>
         </div>
+        <Button variant="outline" className="bg-white" onClick={() => setShowPreview(true)}>
+          <Eye className="w-4 h-4 mr-2" />
+          Preview Email
+        </Button>
       </div>
+
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-50/80 border-b">
@@ -200,6 +288,28 @@ export default function MemberRequestsPage() {
           </tbody>
         </table>
       </div>
+
+      {showPreview && (
+        <div className="fixed inset-0 z-[70] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowPreview(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="bg-gray-900 px-6 py-4 flex justify-between items-center shrink-0">
+              <h2 className="text-lg font-bold text-white flex items-center">
+                <Eye className="w-5 h-5 mr-2" /> Email Template Preview
+              </h2>
+              <button onClick={() => setShowPreview(false)} className="text-white/80 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="flex-1 overflow-auto bg-gray-100 p-6">
+              <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border overflow-hidden">
+                <iframe 
+                  srcDoc={generatePreviewHtml()} 
+                  className="w-full h-[650px] border-0"
+                  title="Email Preview"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {approvalModal && (
         <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setApprovalModal(null)}>
