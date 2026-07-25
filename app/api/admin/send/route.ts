@@ -26,7 +26,7 @@ function buildEmailTemplate(contentHtml: string) {
         }
         
         .body-content h1 {
-          margin-top: 0;
+          margin-top: 0; 
           font-size: 26px;
           color: #1a1a1a;
         }
@@ -43,35 +43,35 @@ function buildEmailTemplate(contentHtml: string) {
     </head>
     <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; -webkit-font-smoothing: antialiased;">
           <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-      
+        
           <div class="header-img-container" style="text-align: center; padding: 35px 20px 0px 20px; background-color: #ffffff;">
             <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
           </div>
-  
+          
           <div class="body-content" style="padding: 20px 40px 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a; background-color: #ffffff;">
             ${contentHtml}
           </div>
-  
+          
           <div class="footer-content" style="background-color: #ffffff; padding: 10px 40px 40px 40px; text-align: center; font-size: 13px; line-height: 1.5;">
+            
           <div style="margin-bottom: 24px;">
-            <!-- TODO: Update these URLs with the new social links -->
-            <a href="https://www.facebook.com/titanleos.sl" style="text-decoration: none; margin: 0 12px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384053.png" width="34" height="34" alt="Facebook" style="display: block; border: none; opacity: 0.85;" />
+            <a href="https://www.facebook.com/titanleos.sl" style="text-decoration: none; margin: 0 12px; display: inline-block; transition: transform 0.2s;">
+              <img src="https://img.icons8.com/fluency/48/facebook-new.png" width="36" height="36" alt="Facebook" style="display: block; border: none;" />
             </a>
-            <a href="https://www.instagram.com/titan_leos" style="text-decoration: none; margin: 0 12px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" width="34" height="34" alt="Instagram" style="display: block; border: none; opacity: 0.85;" />
+            <a href="https://www.instagram.com/titan_leos" style="text-decoration: none; margin: 0 12px; display: inline-block; transition: transform 0.2s;">
+              <img src="https://img.icons8.com/fluency/48/instagram-new.png" width="36" height="36" alt="Instagram" style="display: block; border: none;" />
             </a>
-            <a href="https://www.linkedin.com/in/titanleos/" style="text-decoration: none; margin: 0 12px; display: inline-block;">
-              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384014.png" width="34" height="34" alt="LinkedIn" style="display: block; border: none; opacity: 0.85;" />
+            <a href="https://www.linkedin.com/in/titanleos/" style="text-decoration: none; margin: 0 12px; display: inline-block; transition: transform 0.2s;">
+              <img src="https://img.icons8.com/fluency/48/linkedin.png" width="36" height="36" alt="LinkedIn" style="display: block; border: none;" />
             </a>
           </div>
-        
+          
           <div style="margin-bottom: 12px; font-weight: bold; font-size: 14px;">
             <a href="mailto:info@titanleos.org" style="color: #2563eb; text-decoration: none;">info@titanleos.org</a>&nbsp;
               <span style="margin: 0 8px; color: #2563eb; font-weight: bold;">&bull;</span>&nbsp;
-             <a href="https://www.titanleos.org" style="color: #2563eb; text-decoration: none;">www.titanleos.org</a>
+              <a href="https://www.titanleos.org" style="color: #2563eb; text-decoration: none;">www.titanleos.org</a>
           </div>
-        
+          
           <div style="font-weight: bold; color: #4b5563;">
             &copy; Leo Club of Pannipitiya Metro Titans 2026. All rights reserved.
           </div>
