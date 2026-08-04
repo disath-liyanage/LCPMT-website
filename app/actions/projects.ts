@@ -28,15 +28,13 @@ export async function createProject(formData: FormData) {
   for (const file of imageFiles) {
     if (file && file.size > 0) {
       const fileExt = file.name.split('.').pop()
-      
       const filePath = `projects/${slug}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-      
       const buffer = await file.arrayBuffer()
       
       const { error: uploadError } = await supabase.storage
         .from(BUCKET_NAME)
         .upload(filePath, buffer, {
-          contentType: file.type,
+          contentType: file.type, 
           upsert: false
         })
 
@@ -104,6 +102,45 @@ export async function getProjects() {
   }))
 }
 
+export async function getFeaturedProjects() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('featured_on_main', true)
+    .order('date', { ascending: false }) 
+
+  if (error) {
+    console.error("Failed to fetch featured projects:", error.message)
+    return []
+  }
+
+  return data.map(project => ({
+    ...project,
+    category: project.avenue, 
+    main_image: project.main_image || (project.images && project.images[0]) || project.image_url || null, 
+    images: project.images || [],
+  }))
+}
+
+export async function toggleFeatureProject(id: string, currentStatus: boolean) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('projects')
+    .update({ featured_on_main: !currentStatus })
+    .eq('id', id)
+
+  if (error) {
+    console.error("Failed to toggle feature:", error.message)
+    throw new Error("Failed to update project status")
+  }
+
+  revalidatePath('/admin/projects')
+  revalidatePath('/')
+}
+
 export async function updateProject(id: string, formData: FormData) {
   const supabase = await createClient()
 
@@ -136,7 +173,6 @@ export async function updateProject(id: string, formData: FormData) {
   revalidatePath('/admin/projects')
   revalidatePath('/projects')
   revalidatePath('/')
-  
   redirect('/admin/projects')
 }
 
@@ -161,10 +197,8 @@ export async function deleteProject(id: string) {
       const { error: storageError } = await supabase.storage
         .from(BUCKET_NAME)
         .remove(imagePaths)
-
-      if (storageError) {
+      if (storageError) 
         console.error("Failed to delete images from bucket:", storageError.message)
-      }
     }
   }
 
@@ -173,10 +207,7 @@ export async function deleteProject(id: string) {
     .delete()
     .eq('id', id)
 
-  if (error) {
-    console.error("Failed to delete project row:", error.message)
-    throw new Error("Failed to delete project")
-  }
+  if (error) throw new Error("Failed to delete project")
 
   revalidatePath('/admin/projects')
   revalidatePath('/projects')

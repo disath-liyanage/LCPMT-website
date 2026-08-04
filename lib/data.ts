@@ -19,7 +19,8 @@ export interface Project {
   collaborative_club?: string | null;
   collaborative_club_link?: string | null;
   status?: "upcoming" | "completed";
-  summary?: string;
+  summary?: string; 
+  featured_on_main?: boolean;
 }
 
 export const impactStats = [
