@@ -17,15 +17,12 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
-      <Link 
-        href="/admin/projects" 
-        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-6 transition-colors"
-      >
-        <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
-        Back to Projects
-      </Link>
-
-      <h1 className="text-3xl font-bold mb-8">Edit Project</h1>
+      <div className="flex items-center gap-4 mb-8">
+        <Link href="/admin/projects" className="flex items-center justify-center w-10 h-10 rounded-full bg-muted border border-border hover:bg-accent transition-colors">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
+        </Link>
+        <h1 className="text-3xl font-bold">Edit Project</h1>
+      </div>
       <AdminEditForm project={project} />
     </div>
   );
