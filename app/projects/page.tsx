@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
       
       <main className="flex-grow pt-36 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               All Projects
             </h1>

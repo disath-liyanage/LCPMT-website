@@ -18,6 +18,7 @@ export interface Project {
   images: string[];
   main_image: string | null;
   collaborators?: { name: string; link: string }[];
+  location_type?: "Online" | "Onsite" | "Multiple";
   collaborative_club?: string | null;
   collaborative_club_link?: string | null;
   status?: "upcoming" | "completed";

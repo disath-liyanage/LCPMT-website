@@ -16,6 +16,7 @@ export default function AdminEditForm({ project }: { project: any }) {
   
   const [date, setDate] = useState<Date | undefined>(project.date ? new Date(project.date) : new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [locationType, setLocationType] = useState(project.location_type || "Onsite");
 
   const initialCollabs = project.collaborators?.length > 0 
     ? project.collaborators 
@@ -28,7 +29,7 @@ export default function AdminEditForm({ project }: { project: any }) {
   const [existingImages, setExistingImages] = useState<string[]>(project.images || []);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [mainImageTarget, setMainImageTarget] = useState<string>(project.main_image || ""); // Can be URL or new index "0", "1"
+  const [mainImageTarget, setMainImageTarget] = useState<string>(project.main_image || "");
 
   const handleRemoveExistingImage = (url: string) => {
     setExistingImages((prev) => prev.filter((img) => img !== url));
@@ -75,7 +76,7 @@ export default function AdminEditForm({ project }: { project: any }) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Avenue / Category</label>
-          <select required name="avenue" defaultValue={project.avenue} className="w-full p-2 border rounded-md bg-background">
+          <select required name="avenue" defaultValue={project.avenue} className="w-full p-2.5 border rounded-md bg-background focus:ring-2 focus:ring-primary outline-none">
             <option value="Community Service">Community Service</option>
             <option value="International Service">International Service</option>
             <option value="Digital Transformation">Digital Transformation</option>
@@ -84,6 +85,7 @@ export default function AdminEditForm({ project }: { project: any }) {
             <option value="Membership Development">Membership Development</option>
           </select>
         </div>
+        
         <div className="relative">
           <label className="block text-sm font-medium mb-2">Date</label>
           <button 
@@ -94,7 +96,6 @@ export default function AdminEditForm({ project }: { project: any }) {
             {date ? format(date, "PPP") : "Pick a date"}
             <HugeiconsIcon icon={Calendar01Icon} size={18} className="text-muted-foreground" />
           </button>
-          
           {showCalendar && (
             <div className="absolute top-[70px] left-0 z-50 bg-card border border-border rounded-lg shadow-xl p-2">
               <DayPicker 
@@ -107,9 +108,21 @@ export default function AdminEditForm({ project }: { project: any }) {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Location</label>
-          <input required type="text" name="location" defaultValue={project.location} className="w-full p-2.5 border rounded-md bg-background focus:ring-2 focus:ring-primary outline-none" />
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium mb-2">Location Type</label>
+            <select value={locationType} onChange={(e) => setLocationType(e.target.value)} name="location_type" className="w-full p-2.5 border rounded-md bg-background focus:ring-2 focus:ring-primary outline-none">
+              <option value="Onsite">Onsite (Single Location)</option>
+              <option value="Online">Online</option>
+              <option value="Multiple">Multiple Locations</option>
+            </select>
+          </div>
+          {locationType !== "Online" && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Location Details</label>
+              <input required type="text" name="location" defaultValue={project.location} className="w-full p-2.5 border rounded-md bg-background focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -140,14 +153,13 @@ export default function AdminEditForm({ project }: { project: any }) {
 
       <div className="space-y-4">
         <label className="block text-sm font-medium">Manage Photos</label>
-        
         <div 
           onClick={() => fileInputRef.current?.click()}
           className="w-full border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group"
         >
           <HugeiconsIcon icon={Image01Icon} size={32} className="text-muted-foreground group-hover:text-primary transition-colors mb-3" />
           <p className="font-medium text-sm">Click to upload new photos</p>
-          <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP up to 5MB</p>
+          <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP</p>
           <input 
             type="file" 
             multiple 
@@ -155,16 +167,14 @@ export default function AdminEditForm({ project }: { project: any }) {
             ref={fileInputRef}
             className="hidden"
             onChange={(e) => {
-              if (e.target.files) {
+              if (e.target.files)
                 setNewImages((prev) => [...prev, ...Array.from(e.target.files!)]);
-              }
             }}
           />
         </div>
 
         {(existingImages.length > 0 || newImages.length > 0) && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 bg-muted/20 p-4 rounded-xl border border-border">
-            
             {existingImages.map((url) => (
               <div key={url} onClick={() => setMainImageTarget(url)} className={cn("relative group cursor-pointer rounded-lg overflow-hidden border-4 transition-all h-32", mainImageTarget === url ? "border-primary" : "border-transparent")}>
                 <img src={url} alt="Existing" className="w-full h-full object-cover" />
@@ -174,7 +184,6 @@ export default function AdminEditForm({ project }: { project: any }) {
                 {mainImageTarget === url && <div className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground text-center text-[10px] font-bold py-1">MAIN PHOTO</div>}
               </div>
             ))}
-
             {newImages.map((file, i) => (
               <div key={i} onClick={() => setMainImageTarget(i.toString())} className={cn("relative group cursor-pointer rounded-lg overflow-hidden border-4 transition-all h-32", mainImageTarget === i.toString() ? "border-primary" : "border-transparent")}>
                 <img src={URL.createObjectURL(file)} alt="New" className="w-full h-full object-cover" />
