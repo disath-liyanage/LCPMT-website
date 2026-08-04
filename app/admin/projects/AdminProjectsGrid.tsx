@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useTransition } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button"; // Added buttonVariants
 import { deleteProject, toggleFeatureProject } from "@/app/actions/projects";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -126,13 +126,17 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
                   project.featured_on_main ? "border-primary ring-2 ring-primary ring-offset-2" : "border-border"
                 )}
               >
-                {/* Hover Action Buttons */}
-                <div className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col sm:flex-row gap-2">
-                  <Button asChild variant="secondary" size="sm" className="h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200">
-                    <Link href={`/admin/edit/${project.id}`} onClick={(e) => e.stopPropagation()}>
-                      Edit
-                    </Link>
-                  </Button>
+=                <div className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col sm:flex-row gap-2">
+                  <Link 
+                    href={`/admin/edit/${project.id}`} 
+                    onClick={(e) => e.stopPropagation()}
+                    className={cn(
+                      buttonVariants({ variant: "secondary", size: "sm" }),
+                      "h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200"
+                    )}
+                  >
+                    Edit
+                  </Link>
                   
                   <Button 
                     variant={project.featured_on_main ? "default" : "secondary"} 
