@@ -3,15 +3,24 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar01Icon, Location01FreeIcons } from "@hugeicons/core-free-icons";
 import type { Project } from "@/lib/data";
 
+const stripMarkdown = (str: string) => {
+  if (!str) return "";
+  return str
+    .replace(/[#_*~`]/g, "") // Remove bold, italics, headers, code
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1") // Replace links with just the text
+    .trim();
+};
+
 export default function ProjectCard({ project }: { project: Project }) {
   const displayImage = project.main_image || (project.images && project.images[0]) || "/placeholder.jpg";
+  const previewText = project.summary || stripMarkdown(project.description);
 
   return (
     <article className="group flex flex-col h-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         <Image
           src={displayImage}
-          alt={`${project.title} - ${project.category} project photo`}
+          alt={`${project.title} photo`}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -32,7 +41,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground font-medium">
           <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
             <HugeiconsIcon icon={Calendar01Icon} size={14} />
-            {new Date(project.date).toLocaleDateString()}
+            {new Date(project.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
           </span>
           <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
             <HugeiconsIcon icon={Location01FreeIcons} size={14} />
@@ -40,7 +49,7 @@ export default function ProjectCard({ project }: { project: Project }) {
           </span>
         </div>
         <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-          {project.summary || project.description}
+          {previewText}
         </p>
       </div>
     </article>
