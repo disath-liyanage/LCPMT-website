@@ -53,10 +53,11 @@ export default function AdminProjectCreatePage() {
             <label className="block text-sm font-medium mb-2">Avenue / Category</label>
             <select required name="avenue" className="w-full p-2 border rounded-md bg-background">
               <option value="Community Service">Community Service</option>
-              <option value="Environment">Environment</option>
-              <option value="Health">Health</option>
-              <option value="Youth Development">Youth Development</option>
-              <option value="Fundraising">Fundraising</option>
+              <option value="International Service">International Service</option>
+              <option value="Digital Transformation">Digital Transformation</option>
+              <option value="Public Relations">Public Relations</option>
+              <option value="Sports & Recreation">Sports & Recreation</option>
+              <option value="Membership Development">Membership Development</option>
             </select>
           </div>
           <div>
