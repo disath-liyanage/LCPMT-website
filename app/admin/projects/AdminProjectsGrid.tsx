@@ -10,10 +10,11 @@ import type { Project } from "@/lib/data";
 const categories = [
   "All",
   "Community Service",
-  "Environment",
-  "Health",
-  "Youth Development",
-  "Fundraising",
+  "International Service",
+  "Digital Transformation",
+  "Public Relations",
+  "Sports & Recreation",
+  "Membership Development",
 ];
 
 const stripMarkdown = (str: string) => {

@@ -40,10 +40,11 @@ export default function NewProjectPage() {
             <label htmlFor="avenue" className="block text-sm font-medium mb-1">Avenue</label>
             <select id="avenue" name="avenue" required className="w-full rounded-md border border-input bg-transparent px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
               <option value="Community Service">Community Service</option>
-              <option value="Environment">Environment</option>
-              <option value="Health">Health</option>
-              <option value="Youth Development">Youth Development</option>
-              <option value="Fundraising">Fundraising</option>
+              <option value="International Service">International Service</option>
+              <option value="Digital Transformation">Digital Transformation</option>
+              <option value="Public Relations">Public Relations</option>
+              <option value="Sports & Recreation">Sports & Recreation</option>
+              <option value="Membership Development">Membership Development</option>
             </select>
           </div>
 

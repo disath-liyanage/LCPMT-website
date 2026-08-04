@@ -1,9 +1,10 @@
 export type ProjectCategory =
   | "Community Service"
-  | "Environment"
-  | "Health"
-  | "Youth Development"
-  | "Fundraising"
+  | "International Service"
+  | "Digital Transformation"
+  | "Public Relations"
+  | "Sports & Recreation"
+  | "Membership Development"
   | string;
 
 export interface Project {

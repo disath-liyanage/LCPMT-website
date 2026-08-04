@@ -17,10 +17,11 @@ import type { Project, ProjectCategory } from "@/lib/data";
 const categories: (ProjectCategory | "All")[] = [
   "All",
   "Community Service",
-  "Environment",
-  "Health",
-  "Youth Development",
-  "Fundraising",
+  "International Service",
+  "Digital Transformation",
+  "Public Relations",
+  "Sports & Recreation",
+  "Membership Development",
 ];
 
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
