@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import ProjectCard from "@/components/ui/ProjectCard";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import type { Project } from "@/lib/data";
@@ -41,7 +42,6 @@ export default function FeaturedCarousel({ projects }: { projects: Project[] }) 
 
   return (
     <div className="relative group/carousel w-full">
-      
       {projects.length > 3 && (
         <button 
           onClick={() => scroll("left")}
@@ -61,12 +61,13 @@ export default function FeaturedCarousel({ projects }: { projects: Project[] }) 
         className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {projects.map((project) => (
-          <div 
+          <Link 
+            href={`/projects?project=${project.id}`}
             key={project.id} 
-            className="w-full flex-none snap-start sm:w-[calc(50%-12px)] lg:w-[calc(33.333333%-16px)]"
+            className="w-full flex-none snap-start sm:w-[calc(50%-12px)] lg:w-[calc(33.333333%-16px)] cursor-pointer block"
           >
             <ProjectCard project={project} />
-          </div>
+          </Link>
         ))}
       </div>
 
