@@ -37,13 +37,29 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     [active, projects]
   );
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get("project");
+    if (projectId) {
+      const index = filtered.findIndex((p) => p.id === projectId);
+      if (index !== -1) {
+        setSelectedIndex(index);
+        window.history.replaceState({}, "", "/projects"); 
+      }
+    }
+  }, [filtered]);
+
   const activeProject = selectedIndex !== null ? filtered[selectedIndex] : null;
 
   const carouselImages = useMemo(() => {
     if (!activeProject) return [];
-    if (activeProject.images && activeProject.images.length > 0) return activeProject.images;
-    if (activeProject.main_image) return [activeProject.main_image];
-    return [];
+    const allImages = activeProject.images || [];
+    const main = activeProject.main_image;
+    
+    if (main) {
+      return [main, ...allImages.filter((img) => img !== main)];
+    }
+    return allImages;
   }, [activeProject]);
 
   useEffect(() => {
@@ -70,16 +86,6 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     setSelectedIndex(index);
     setActiveImageIndex(0);
     setIsZoomed(false);
-  };
-
-  const handleNextImage = () => {
-    setIsZoomed(false);
-    setActiveImageIndex((prev) => (prev + 1) % carouselImages.length);
-  };
-
-  const handlePrevImage = () => {
-    setIsZoomed(false);
-    setActiveImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
   };
 
   return (
@@ -120,12 +126,12 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       )}
 
       {activeProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:px-20">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:px-20">
           
           <button 
             onClick={() => goToProject(selectedIndex! - 1)}
             disabled={selectedIndex === 0}
-            className="hidden md:flex absolute left-4 z-50 p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="hidden md:flex absolute left-4 z-[110] p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
           </button>
@@ -134,7 +140,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
             
             <button 
               onClick={closeProject}
-              className="absolute top-4 right-4 z-50 p-2 bg-background/80 hover:bg-background border border-border rounded-full backdrop-blur-md transition-colors"
+              className="absolute top-4 right-4 z-[110] p-2 bg-background/80 hover:bg-background border border-border rounded-full backdrop-blur-md transition-colors"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={24} />
             </button>
@@ -155,13 +161,13 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                   {carouselImages.length > 1 && (
                     <>
                       <button 
-                        onClick={handlePrevImage}
+                        onClick={() => { setIsZoomed(false); setActiveImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length); }}
                         className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black text-white rounded-full opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
                       </button>
                       <button 
-                        onClick={handleNextImage}
+                        onClick={() => { setIsZoomed(false); setActiveImageIndex((prev) => (prev + 1) % carouselImages.length); }}
                         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black text-white rounded-full opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
@@ -172,13 +178,10 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                           <div 
                             key={i}
                             className={cn(
-                              "h-2 rounded-full transition-all duration-300",
-                              i === activeImageIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/90 cursor-pointer"
+                              "h-2 rounded-full transition-all duration-300 cursor-pointer",
+                              i === activeImageIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/90"
                             )}
-                            onClick={() => {
-                              setIsZoomed(false);
-                              setActiveImageIndex(i);
-                            }}
+                            onClick={() => { setIsZoomed(false); setActiveImageIndex(i); }}
                           />
                         ))}
                       </div>
@@ -192,7 +195,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
             <div className="w-full md:w-1/2 h-[55%] md:h-full flex flex-col relative bg-card">
               <div className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
-                <div className="flex flex-wrap items-center gap-3 mb-4 pr-10">
+                <div className="flex flex-wrap items-center gap-3 mb-2 pr-10">
                   <span className="px-3 py-1 bg-secondary text-secondary-foreground text-xs font-bold rounded-full uppercase tracking-wider">
                     {activeProject.category}
                   </span>
@@ -210,9 +213,9 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                   )}
                 </div>
 
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">{activeProject.title}</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">{activeProject.title}</h2>
                 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8 pb-8 border-b border-border">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
                   <span>{new Date(activeProject.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   <span>•</span>
                   <span>{activeProject.location}</span>
@@ -237,33 +240,13 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                   </ReactMarkdown>
                 </div>
               </div>
-
-              <div className="md:hidden absolute bottom-0 left-0 right-0 flex items-center justify-between p-4 border-t border-border bg-card">
-                <button 
-                  onClick={() => goToProject(selectedIndex! - 1)}
-                  disabled={selectedIndex === 0}
-                  className="p-2 hover:bg-muted rounded-full disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
-                </button>
-                <span className="text-sm font-medium text-muted-foreground">
-                  Project {selectedIndex! + 1} of {filtered.length}
-                </span>
-                <button 
-                  onClick={() => goToProject(selectedIndex! + 1)}
-                  disabled={selectedIndex === filtered.length - 1}
-                  className="p-2 hover:bg-muted rounded-full disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
-                </button>
-              </div>
             </div>
           </div>
 
           <button 
             onClick={() => goToProject(selectedIndex! + 1)}
             disabled={selectedIndex === filtered.length - 1}
-            className="hidden md:flex absolute right-4 z-50 p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="hidden md:flex absolute right-4 z-[110] p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={28} />
           </button>
