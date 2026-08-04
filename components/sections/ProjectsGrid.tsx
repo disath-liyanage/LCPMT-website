@@ -201,25 +201,48 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                     {activeProject.category}
                   </span>
                   
-                  {activeProject.collaborative_club && (
-                    <a 
-                      href={activeProject.collaborative_club_link || "#"} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-full transition-colors"
-                    >
-                      {activeProject.collaborative_club}
-                      {activeProject.collaborative_club_link && <HugeiconsIcon icon={LinkSquare01Icon} size={14} />}
-                    </a>
+                  {activeProject.collaborators && activeProject.collaborators.length > 0 ? (
+                    activeProject.collaborators.map((collab, idx) => (
+                      <a 
+                        key={idx}
+                        href={collab.link || "#"} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-full transition-colors"
+                      >
+                        {collab.name}
+                        {collab.link && <HugeiconsIcon icon={LinkSquare01Icon} size={14} />}
+                      </a>
+                    ))
+                  ) : (
+                    activeProject.collaborative_club && (
+                      <a 
+                        href={activeProject.collaborative_club_link || "#"} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-full transition-colors"
+                      >
+                        {activeProject.collaborative_club}
+                        {activeProject.collaborative_club_link && <HugeiconsIcon icon={LinkSquare01Icon} size={14} />}
+                      </a>
+                    )
                   )}
                 </div>
 
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">{activeProject.title}</h2>
                 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border">
                   <span>{new Date(activeProject.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   <span>•</span>
-                  <span>{activeProject.location}</span>
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeProject.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary hover:underline transition-colors flex items-center gap-1"
+                  >
+                    {activeProject.location}
+                    <HugeiconsIcon icon={LinkSquare01Icon} size={14} className="opacity-50" />
+                  </a>
                 </div>
                 
                 <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-foreground/90">

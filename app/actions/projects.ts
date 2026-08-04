@@ -11,15 +11,14 @@ export async function createProject(formData: FormData) {
 
   const title = formData.get('title') as string
   const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-  const uniqueId = Math.random().toString(36).substring(2, 8)
-  const slug = `${baseSlug}-${uniqueId}`
+  const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 8)}`
   
   const description = formData.get('description') as string
   const date = formData.get('date') as string
   const location = formData.get('location') as string
   const avenue = formData.get('avenue') as string
-  const collaborative_club = formData.get('collaborative_club') as string || null
-  const collaborative_club_link = formData.get('collaborative_club_link') as string || null
+  
+  const collaborators = JSON.parse(formData.get('collaborators') as string || '[]')
   
   const mainImageIndex = parseInt(formData.get('main_image_index') as string || '0')
   const imageFiles = formData.getAll('images') as File[]
@@ -31,23 +30,13 @@ export async function createProject(formData: FormData) {
       const filePath = `projects/${slug}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`
       const buffer = await file.arrayBuffer()
       
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET_NAME)
-        .upload(filePath, buffer, {
-          contentType: file.type, 
-          upsert: false
-        })
-
-      if (uploadError) {
-        console.error("Storage upload error:", uploadError.message)
-        throw new Error(`Failed to upload image: ${uploadError.message}`)
-      }
-
-      const { data: { publicUrl } } = supabase.storage
+      const { error } = await supabase.storage.from(BUCKET_NAME).upload(filePath, buffer, { contentType: file.type })
+      if (!error) {
+        const { data } = supabase.storage
         .from(BUCKET_NAME)
         .getPublicUrl(filePath)
-
-      imageUrls.push(publicUrl)
+        imageUrls.push(data.publicUrl)
+      }
     }
   }
 
@@ -63,17 +52,14 @@ export async function createProject(formData: FormData) {
         date,
         location,
         avenue,
-        collaborative_club,
-        collaborative_club_link,
+        collaborators,
         images: imageUrls,
         main_image
       }
     ])
 
-  if (dbError) {
-    console.error("Supabase DB Error:", dbError.message)
-    throw new Error(`Failed to save project to database: ${dbError.message}`)
-  }
+  if (dbError) 
+    throw new Error(`Failed to save: ${dbError.message}`)
 
   revalidatePath('/admin/projects')
   revalidatePath('/projects')
@@ -149,26 +135,47 @@ export async function updateProject(id: string, formData: FormData) {
   const date = formData.get('date') as string
   const location = formData.get('location') as string
   const avenue = formData.get('avenue') as string
-  const collaborative_club = formData.get('collaborative_club') as string || null
-  const collaborative_club_link = formData.get('collaborative_club_link') as string || null
+  const collaborators = JSON.parse(formData.get('collaborators') as string || '[]')
   
-  const { error: dbError } = await supabase
-    .from('projects')
-    .update({
-      title,
-      description,
-      date,
-      location,
-      avenue,
-      collaborative_club,
-      collaborative_club_link,
-    })
-    .eq('id', id)
+  const existingImages = JSON.parse(formData.get('existing_images') as string || '[]')
+  const imagesToDelete = JSON.parse(formData.get('images_to_delete') as string || '[]')
+  const mainImageTarget = formData.get('main_image_target') as string 
+  const newImageFiles = formData.getAll('new_images') as File[]
 
-  if (dbError) {
-    console.error("Supabase DB Error:", dbError.message)
-    throw new Error(`Failed to update project: ${dbError.message}`)
+  if (imagesToDelete.length > 0) {
+    const paths = imagesToDelete.map((url: string) => url.split(`/public/${BUCKET_NAME}/`)[1]).filter(Boolean)
+    if (paths.length > 0) await supabase.storage.from(BUCKET_NAME).remove(paths)
   }
+
+  const newImageUrls: string[] = []
+  for (const file of newImageFiles) {
+    if (file && file.size > 0) {
+      const fileExt = file.name.split('.').pop()
+      const filePath = `projects/update-${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+      const buffer = await file.arrayBuffer()
+      const { error } = await supabase.storage.from(BUCKET_NAME).upload(filePath, buffer, { contentType: file.type })
+      if (!error) {
+        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath)
+        newImageUrls.push(data.publicUrl)
+      }
+    }
+  }
+
+  const finalImages = [...existingImages, ...newImageUrls]
+
+  let finalMainImage = finalImages[0] || null
+  if (mainImageTarget.startsWith('http')) {
+    finalMainImage = mainImageTarget
+  } else if (mainImageTarget !== "") {
+    const newIdx = parseInt(mainImageTarget)
+    if (!isNaN(newIdx) && newImageUrls[newIdx]) finalMainImage = newImageUrls[newIdx]
+  }
+
+  const { error: dbError } = await supabase.from('projects').update({
+    title, description, date, location, avenue, collaborators, images: finalImages, main_image: finalMainImage
+  }).eq('id', id)
+
+  if (dbError) throw new Error(`Failed to update project: ${dbError.message}`)
 
   revalidatePath('/admin/projects')
   revalidatePath('/projects')

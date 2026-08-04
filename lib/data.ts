@@ -17,6 +17,7 @@ export interface Project {
   description: string;
   images: string[];
   main_image: string | null;
+  collaborators?: { name: string; link: string }[];
   collaborative_club?: string | null;
   collaborative_club_link?: string | null;
   status?: "upcoming" | "completed";
