@@ -104,6 +104,42 @@ export async function getProjects() {
   }))
 }
 
+export async function updateProject(id: string, formData: FormData) {
+  const supabase = await createClient()
+
+  const title = formData.get('title') as string
+  const description = formData.get('description') as string
+  const date = formData.get('date') as string
+  const location = formData.get('location') as string
+  const avenue = formData.get('avenue') as string
+  const collaborative_club = formData.get('collaborative_club') as string || null
+  const collaborative_club_link = formData.get('collaborative_club_link') as string || null
+  
+  const { error: dbError } = await supabase
+    .from('projects')
+    .update({
+      title,
+      description,
+      date,
+      location,
+      avenue,
+      collaborative_club,
+      collaborative_club_link,
+    })
+    .eq('id', id)
+
+  if (dbError) {
+    console.error("Supabase DB Error:", dbError.message)
+    throw new Error(`Failed to update project: ${dbError.message}`)
+  }
+
+  revalidatePath('/admin/projects')
+  revalidatePath('/projects')
+  revalidatePath('/')
+  
+  redirect('/admin/projects')
+}
+
 export async function deleteProject(id: string) {
   const supabase = await createClient()
 
