@@ -10,7 +10,6 @@ export async function createProject(formData: FormData) {
   const supabase = await createClient()
 
   const title = formData.get('title') as string
-  
   const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
   const uniqueId = Math.random().toString(36).substring(2, 8)
   const slug = `${baseSlug}-${uniqueId}`
@@ -19,9 +18,13 @@ export async function createProject(formData: FormData) {
   const date = formData.get('date') as string
   const location = formData.get('location') as string
   const avenue = formData.get('avenue') as string
-  const collaborative_club = formData.get('collaborative_club') as string
+  const collaborative_club = formData.get('collaborative_club') as string || null
+  const collaborative_club_link = formData.get('collaborative_club_link') as string || null
   
-  const image_url = formData.get('image_url') as string || null
+  const imagesJson = formData.get('images') as string
+  const images = imagesJson ? JSON.parse(imagesJson) : []
+  const mainImageIndex = parseInt(formData.get('main_image_index') as string || '0')
+  const main_image = images.length > 0 ? images[mainImageIndex] : null
 
   const { error } = await supabase
     .from('projects')
@@ -34,7 +37,9 @@ export async function createProject(formData: FormData) {
         location,
         avenue,
         collaborative_club,
-        image_url 
+        collaborative_club_link,
+        images,
+        main_image
       }
     ])
 
@@ -65,7 +70,8 @@ export async function getProjects() {
   return data.map(project => ({
     ...project,
     category: project.avenue, 
-    image: project.image_url, 
+    main_image: project.main_image || (project.images && project.images[0]) || project.image_url || null, 
+    images: project.images || [],
   }))
 }
 
@@ -74,20 +80,20 @@ export async function deleteProject(id: string) {
 
   const { data: project } = await supabase
     .from('projects')
-    .select('image_url')
+    .select('images')
     .eq('id', id)
     .single()
 
-  if (project?.image_url) {
-    const imagePath = project.image_url.split(`/public/${BUCKET_NAME}/`)[1]
+  if (project?.images && project.images.length > 0) {
+    const imagePaths = project.images.map((url: string) => url.split(`/public/${BUCKET_NAME}/`)[1]).filter(Boolean)
     
-    if (imagePath) {
+    if (imagePaths.length > 0) {
       const { error: storageError } = await supabase.storage
         .from(BUCKET_NAME)
-        .remove([imagePath])
+        .remove(imagePaths)
 
       if (storageError) {
-        console.error("Failed to delete image from bucket:", storageError.message)
+        console.error("Failed to delete images from bucket:", storageError.message)
       }
     }
   }

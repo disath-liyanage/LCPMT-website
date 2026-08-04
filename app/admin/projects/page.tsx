@@ -28,7 +28,6 @@ export default async function AdminProjectsDashboard() {
           </p>
         </div>
         
-        {/* Assuming your create route is /admin/create. Adjust if it is /admin/projects/create */}
         <Link href="/admin/create" className={buttonVariants({ variant: "default" })}>
           Add New Project
         </Link>
