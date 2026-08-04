@@ -1,11 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ProjectCard from "@/components/ui/ProjectCard";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon, Cancel01Icon, LinkSquare01Icon } from "@hugeicons/core-free-icons";
+import { 
+  ArrowLeft01Icon, 
+  ArrowRight01Icon, 
+  Cancel01Icon, 
+  LinkSquare01Icon 
+} from "@hugeicons/core-free-icons";
 import type { Project, ProjectCategory } from "@/lib/data";
 
 const categories: (ProjectCategory | "All")[] = [
@@ -20,6 +26,7 @@ const categories: (ProjectCategory | "All")[] = [
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState<(typeof categories)[number]>("All");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   const filtered = useMemo(
     () =>
@@ -30,6 +37,42 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   );
 
   const activeProject = selectedIndex !== null ? filtered[selectedIndex] : null;
+
+  const carouselImages = useMemo(() => {
+    if (!activeProject) return [];
+    if (activeProject.images && activeProject.images.length > 0) return activeProject.images;
+    if (activeProject.main_image) return [activeProject.main_image];
+    return [];
+  }, [activeProject]);
+
+  useEffect(() => {
+    if (selectedIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedIndex]);
+
+  const closeProject = () => {
+    setSelectedIndex(null);
+    setActiveImageIndex(0);
+  };
+
+  const goToProject = (index: number) => {
+    setSelectedIndex(index);
+    setActiveImageIndex(0);
+  };
+
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev + 1) % carouselImages.length);
+  };
+
+  const handlePrevImage = () => {
+    setActiveImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+  };
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -44,7 +87,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
             type="button"
             onClick={() => {
               setActive(category);
-              setSelectedIndex(null);
+              closeProject();
             }}
             aria-pressed={active === category}
             className={cn(
@@ -62,7 +105,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((project, index) => (
-            <div key={project.slug} onClick={() => setSelectedIndex(index)} className="cursor-pointer">
+            <div key={project.slug} onClick={() => goToProject(index)} className="cursor-pointer">
               <ProjectCard project={project} />
             </div>
           ))}
@@ -74,45 +117,74 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       )}
 
       {activeProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm p-4 sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:px-20">
+          
+          <button 
+            onClick={() => goToProject(selectedIndex! - 1)}
+            disabled={selectedIndex === 0}
+            className="hidden md:flex absolute left-4 z-50 p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+          </button>
+
           <div className="relative flex flex-col md:flex-row w-full max-w-6xl h-[90vh] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
             
             <button 
-              onClick={() => setSelectedIndex(null)}
-              className="absolute top-4 right-4 z-10 p-2 bg-background/50 hover:bg-background rounded-full backdrop-blur-md transition-colors"
+              onClick={closeProject}
+              className="absolute top-4 right-4 z-50 p-2 bg-background/80 hover:bg-background border border-border rounded-full backdrop-blur-md transition-colors"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={24} />
             </button>
 
-            <div className="w-full md:w-1/2 h-[40%] md:h-full bg-muted overflow-y-auto snap-y snap-mandatory hide-scrollbar">
-              {activeProject.images && activeProject.images.length > 0 ? (
-                activeProject.images.map((img, i) => (
-                  <div key={i} className="w-full h-full snap-start flex-shrink-0">
-                    <img 
-                      src={img} 
-                      alt={`${activeProject.title} photo ${i + 1}`} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))
-              ) : activeProject.main_image ? (
-                <div className="w-full h-full flex-shrink-0">
+            <div className="relative w-full md:w-1/2 h-[40%] md:h-full bg-black group flex items-center justify-center overflow-hidden">
+              {carouselImages.length > 0 ? (
+                <>
                   <img 
-                    src={activeProject.main_image} 
-                    alt={activeProject.title} 
-                    className="w-full h-full object-cover"
+                    src={carouselImages[activeImageIndex]} 
+                    alt={`${activeProject.title} photo ${activeImageIndex + 1}`} 
+                    className="w-full h-full object-contain sm:object-cover transition-opacity duration-300"
                   />
-                </div>
+
+                  {carouselImages.length > 1 && (
+                    <>
+                      <button 
+                        onClick={handlePrevImage}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"
+                      >
+                        <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
+                      </button>
+                      <button 
+                        onClick={handleNextImage}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"
+                      >
+                        <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
+                      </button>
+
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/20 px-3 py-2 rounded-full backdrop-blur-sm">
+                        {carouselImages.map((_, i) => (
+                          <div 
+                            key={i}
+                            className={cn(
+                              "h-2 rounded-full transition-all duration-300",
+                              i === activeImageIndex 
+                                ? "w-6 bg-white" 
+                                : "w-2 bg-white/50 hover:bg-white/80 cursor-pointer"
+                            )}
+                            onClick={() => setActiveImageIndex(i)}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted-foreground">No images available</span>
-                </div>
+                <span className="text-white/50">No images available</span>
               )}
             </div>
 
-            <div className="w-full md:w-1/2 h-[60%] md:h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto p-6 md:p-10">
-                <div className="flex flex-wrap items-center gap-3 mb-4">
+            <div className="w-full md:w-1/2 h-[60%] md:h-full flex flex-col relative">
+              <div className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
+                <div className="flex flex-wrap items-center gap-3 mb-4 pr-10">
                   <span className="px-3 py-1 bg-secondary text-secondary-foreground text-xs font-bold rounded-full uppercase tracking-wider">
                     {activeProject.category}
                   </span>
@@ -139,43 +211,48 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">{activeProject.title}</h2>
                 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8 pb-8 border-b border-border">
-                  <span>{new Date(activeProject.date).toLocaleDateString()}</span>
+                  <span>{new Date(activeProject.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   <span>•</span>
                   <span>{activeProject.location}</span>
                 </div>
                 
-                {/* Markdown Content */}
                 <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
-                  <ReactMarkdown>{activeProject.description}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {activeProject.description}
+                  </ReactMarkdown>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 border-t border-border bg-muted/10">
+              <div className="md:hidden absolute bottom-0 left-0 right-0 flex items-center justify-between p-4 border-t border-border bg-card">
                 <button 
-                  onClick={() => setSelectedIndex(selectedIndex - 1)}
+                  onClick={() => goToProject(selectedIndex! - 1)}
                   disabled={selectedIndex === 0}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="p-2 hover:bg-muted rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
-                  <span className="hidden sm:inline font-medium">Previous Project</span>
+                  <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
                 </button>
-                
                 <span className="text-sm font-medium text-muted-foreground">
-                  {selectedIndex + 1} of {filtered.length}
+                  Project {selectedIndex! + 1} of {filtered.length}
                 </span>
-
                 <button 
-                  onClick={() => setSelectedIndex(selectedIndex + 1)}
+                  onClick={() => goToProject(selectedIndex! + 1)}
                   disabled={selectedIndex === filtered.length - 1}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="p-2 hover:bg-muted rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  <span className="hidden sm:inline font-medium">Next Project</span>
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={20} />
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
                 </button>
               </div>
             </div>
-
           </div>
+
+          <button 
+            onClick={() => goToProject(selectedIndex! + 1)}
+            disabled={selectedIndex === filtered.length - 1}
+            className="hidden md:flex absolute right-4 z-50 p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <HugeiconsIcon icon={ArrowRight01Icon} size={28} />
+          </button>
+
         </div>
       )}
     </section>
