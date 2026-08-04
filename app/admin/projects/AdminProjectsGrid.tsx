@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect, useTransition } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { deleteProject } from "@/app/actions/projects";
+import { deleteProject, toggleFeatureProject } from "@/app/actions/projects";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -54,7 +54,6 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
     return [];
   }, [activeProject]);
 
-  // Aggressive scroll lock
   useEffect(() => {
     if (selectedIndex !== null) {
       document.body.style.overflow = "hidden";
@@ -122,16 +121,32 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
               <div 
                 key={project.id} 
                 onClick={() => goToProject(index)}
-                className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+                className={cn(
+                  "group relative flex flex-col h-full overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer",
+                  project.featured_on_main ? "border-primary ring-2 ring-primary ring-offset-2" : "border-border"
+                )}
               >
                 {/* Hover Action Buttons */}
-                <div className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href={`/admin/edit/${project.id}`} onClick={(e) => e.stopPropagation()}>
-                    <Button variant="secondary" size="sm" className="h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200">
+                <div className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col sm:flex-row gap-2">
+                  <Button asChild variant="secondary" size="sm" className="h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200">
+                    <Link href={`/admin/edit/${project.id}`} onClick={(e) => e.stopPropagation()}>
                       Edit
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
+                  
+                  <Button 
+                    variant={project.featured_on_main ? "default" : "secondary"} 
+                    size="sm" 
+                    className={cn("h-8 px-4 font-bold shadow-md", !project.featured_on_main && "bg-white text-black hover:bg-gray-200")}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await toggleFeatureProject(project.id, project.featured_on_main || false);
+                    }}
+                  >
+                    {project.featured_on_main ? "★ Featured" : "Add to Main"}
+                  </Button>
                 </div>
+
                 <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Button 
                     variant="destructive" 
@@ -153,9 +168,11 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
                     alt={`${project.title} photo`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute left-3 bottom-3 rounded-full bg-secondary/90 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-secondary-foreground z-10">
-                    {project.category}
-                  </span>
+                  {project.featured_on_main && (
+                    <span className="absolute bottom-3 left-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground z-10 shadow-md">
+                      ★ Main Page
+                    </span>
+                  )}
                   {project.images && project.images.length > 1 && (
                     <span className="absolute right-3 bottom-3 rounded-md bg-background/80 backdrop-blur-sm px-2 py-1 text-xs font-medium text-foreground z-10">
                       {project.images.length} Photos
