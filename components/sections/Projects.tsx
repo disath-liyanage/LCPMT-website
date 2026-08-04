@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
-import ProjectCard from "@/components/ui/ProjectCard";
 import { getFeaturedProjects } from "@/app/actions/projects";
+import FeaturedCarousel from "./FeaturedCarousel";
 
 export default async function FeaturedProjects() {
   const featuredProjects = await getFeaturedProjects();
@@ -13,9 +12,9 @@ export default async function FeaturedProjects() {
   }
 
   return (
-    <section className="bg-muted/30 py-20" id="projects">
+    <section className="bg-muted/30 py-24" id="projects">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end mb-12">
+        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end mb-12">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">
               Our Impact
@@ -24,19 +23,22 @@ export default async function FeaturedProjects() {
               Featured Projects
             </h2>
           </div>
-          <Button asChild variant="outline" className="gap-2">
-            <Link href="/projects">
-              View All Projects
-              <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
-            </Link>
-          </Button>
+          
+          <Link 
+            href="/projects" 
+            className="group flex items-center gap-2 text-sm font-semibold tracking-wide text-primary hover:text-primary/80 transition-colors pb-1"
+          >
+            <span>View All Projects</span>
+            <HugeiconsIcon 
+              icon={ArrowRight01Icon} 
+              size={18} 
+              className="transition-transform duration-300 group-hover:translate-x-1.5" 
+            />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        <FeaturedCarousel projects={featuredProjects} />
+
       </div>
     </section>
   );
