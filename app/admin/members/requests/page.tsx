@@ -174,7 +174,7 @@ export default function MemberRequestsPage() {
       <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; -webkit-font-smoothing: antialiased;">
       <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div class="header-img-container" style="text-align: center; padding: 35px 20px 0px 20px; background-color: #ffffff;">
-          <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
+          <img src="${SITE_URL}/images/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
         </div>
         <div class="body-content" style="padding: 20px 40px 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a; background-color: #ffffff;">
           <h1 style="margin-top: 0; font-size: 26px; color: #1a1a1a;">Congratulations, John Doe! 🎉</h1>
