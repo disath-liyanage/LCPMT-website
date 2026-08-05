@@ -45,7 +45,7 @@ function buildEmailTemplate(contentHtml: string) {
           <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         
           <div class="header-img-container" style="text-align: center; padding: 35px 20px 0px 20px; background-color: #ffffff;">
-            <img src="${SITE_URL}/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
+            <img src="${SITE_URL}/images/email.png" alt="Titan Leos Header" style="max-width: 280px; height: auto; display: inline-block;" />
           </div>
           
           <div class="body-content" style="padding: 20px 40px 30px 40px; font-size: 16px; line-height: 1.6; color: #1a1a1a; background-color: #ffffff;">
