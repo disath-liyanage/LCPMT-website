@@ -33,9 +33,16 @@ export const metadata: Metadata = {
     "Leoism",
     "Homagama volunteering",
   ],
-  
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  icons: {
+    icon: [
+      { url: "/images/logo.svg", type: "image/svg+xml" }
+    ],
+    apple: [
+      { url: "/images/logo.svg" } 
+    ]
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

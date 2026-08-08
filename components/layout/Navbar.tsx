@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -113,9 +114,16 @@ export default function Navbar() {
           href="/#hero"
           className="flex shrink-0 items-center gap-3 z-10 transition-transform hover:scale-105"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-sm">
-            LT
-          </span>
+          <Image 
+            src="/images/logo.png"
+            alt="Leo Club Logo" 
+            width={256}
+            height={256} 
+            quality={100}
+            priority
+          
+            className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-full shadow-md"
+          />
           <span className="hidden sm:flex flex-col leading-tight whitespace-nowrap">
             <span className="text-sm font-bold text-[#2D3F2B]">
               Leo Club of
@@ -131,7 +139,7 @@ export default function Navbar() {
           className="relative flex items-center gap-4 sm:gap-6 overflow-x-auto mx-4 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden z-10"
         >
           <span 
-            className="absolute bottom-1 h-[2px] rounded-full bg-[#2D3F2B] transition-all duration-1500 ease-out pointer-events-none"
+            className="absolute bottom-1 h-[2px] rounded-full bg-[#2D3F2B] transition-all duration-300 ease-out pointer-events-none"
             style={indicatorStyle}
           />
 
