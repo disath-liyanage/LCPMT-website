@@ -1,31 +1,38 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
 
 export default function JoinCta() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8" id="join">
-      <div className="flex flex-col items-start gap-6 rounded-2xl bg-secondary px-6 py-12 sm:px-12 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-secondary-foreground sm:text-3xl">
-            Ready to make an impact?
+    <section className="relative mx-auto max-w-5xl px-4 py-32 sm:px-6 lg:px-8 overflow-hidden" id="join">
+      <div className="flex flex-col items-center text-center gap-8">
+        
+        <div className="space-y-6 max-w-3xl">
+          <h2 className="text-5xl sm:text-7xl font-extrabold tracking-tighter text-[#1C2B1E] leading-[1.05]">
+            Stop watching. <br className="hidden sm:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2D3F2B] to-[#556B52]">
+              Start impacting.
+            </span>
           </h2>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-secondary-foreground/80 sm:text-base">
-            We welcome young people aged 12-30 from Pannipitiya and beyond.
-            No experience needed - just a willingness to serve.
+          <p className="mx-auto max-w-xl text-base sm:text-lg text-[#556B52] leading-relaxed font-medium">
+            We need doers aged 12-30 from Pannipitiya and beyond. Zero experience required - just the guts to step up and serve your community.
           </p>
         </div>
-        <Button
-          size="lg"
-          className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
-          render={
-            <Link href="/join">
-              Join the Club
-              <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
-            </Link>
-          }
-        />
+
+        <div className="pt-4">
+          <Link
+            href="/join"
+            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-[#2D3F2B] px-8 py-4 text-sm sm:text-base font-bold text-[#F5F0E8] transition-all duration-300 hover:bg-[#1C2B1E] hover:scale-105 hover:shadow-[0_8px_30px_rgba(45,63,43,0.3)] active:scale-95"
+          >
+            <span>Join the Club</span>
+            <HugeiconsIcon 
+              icon={ArrowRight01Icon} 
+              size={20} 
+              className="transition-transform duration-300 group-hover:translate-x-1.5" 
+            />
+          </Link>
+        </div>
+
       </div>
     </section>
   );
