@@ -2,67 +2,92 @@ import Image from "next/image";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
-import { impactStats } from "@/lib/data";
+import { ShinyButton } from "@/components/ui/shiny-button";
+import { LiquidButton } from "@/components/ui/liquid-button";
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative overflow-hidden bg-primary" >
-      <div className="absolute inset-0">
+    <section id="hero" className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F2E7] pt-24 pb-12">
+      
+      <div className="pointer-events-none absolute -left-[20vw] top-1/2 z-0 h-[calc(100dvh-8px)] w-[calc(100dvh-8px)] -translate-y-1/2 opacity-5 lg:-left-[10vw]">
         <Image
-          src="/images/placeholders/hero-home.jpg"
-          alt="Leo Club of Pannipitiya Metro Titans members at a community service project"
+          src="/images/titan.svg" 
+          alt="Titan Helmet Background Pattern"
           fill
           priority
-          sizes="100vw"
-          className="object-cover opacity-80"
+          className="object-contain"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/60" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-secondary">
-          Leo Club of Pannipitiya Metro Titans
-        </p>
-        <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl">
-          Where there&apos;s a need, there&apos;s a Leo.
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg">
-          We are a youth-led community service club in Pannipitiya, Sri
-          Lanka, sponsored by Lions Clubs International. We run projects in
-          community welfare, environment, health and youth leadership -
-          built and led entirely by young volunteers.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Button
-            size="lg"
-            render={
-              <Link href="/join">
-                Become a Leo
-                <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+      <div className="relative z-10 mx-auto w-full max-w-[90rem] px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          
+          <div className="max-w-3xl">
+            <h1 className="text-[3.5rem] font-extrabold leading-[1.05] tracking-tight text-[#07120D] sm:text-6xl lg:text-[5rem] xl:text-[5.5rem]">
+              <span className="block whitespace-nowrap">Purpose Through</span>
+              <span className="block text-[#2F5D46]">Service</span>
+            </h1>
+            
+            <p className="mt-8 text-xl leading-relaxed text-[#173D2A] sm:text-2xl">
+              We are the <span className="font-bold">Leo Club of Pannipitiya Metro Titans</span>  
+              <br className="mt-2 block" /> 
+              A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
+            </p>
+            
+            <div className="mt-12 flex flex-wrap items-center gap-5">
+              <Link href="/join" className="w-full sm:w-auto">
+                <ShinyButton className="h-16 w-full px-10 text-lg">
+                  Join the Titans
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={24} className="ml-2" />
+                </ShinyButton>
               </Link>
-            }
-          />
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            render={<Link href="/projects">See Our Projects</Link>}
-          />
-        </div>
-
-        <dl className="mt-16 grid grid-cols-2 gap-6 border-t border-primary-foreground/15 pt-8 sm:grid-cols-4">
-          {impactStats.map((stat) => (
-            <div key={stat.label}>
-              <dt className="text-2xl font-bold text-secondary sm:text-3xl">
-                {stat.value}
-              </dt>
-              <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-primary-foreground/70 sm:text-sm">
-                {stat.label}
-              </dd>
+              
+              <Link href="/projects" className="w-full sm:w-auto">
+                <LiquidButton 
+                  variant="outline" 
+                  className="h-16 w-full rounded-full border-2 border-[#0F2A1D]/20 px-10 text-[1.125rem] font-bold text-[#0F2A1D]"
+                >
+                  See Our Impact
+                </LiquidButton>
+              </Link>
             </div>
-          ))}
-        </dl>
+          </div>
+
+          <div className="flex w-full flex-col gap-5">
+            <div className="relative w-full overflow-hidden rounded-3xl bg-[#E8D8B8] aspect-[4/3] lg:aspect-[16/11]">
+              <Image
+                src="/images/hero-1.jpeg"
+                alt="Leo Club community service project"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-5">
+              <div className="relative w-full overflow-hidden rounded-2xl bg-[#C8A45D]/20 aspect-[4/3] lg:aspect-[16/9]">
+                <Image
+                  src="/images/hero-2.jpeg"
+                  alt="Leo Club youth leadership"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+              <div className="relative w-full overflow-hidden rounded-2xl bg-[#C8A45D]/20 aspect-[4/3] lg:aspect-[16/9]">
+                <Image
+                  src="/images/hero-3.jpeg"
+                  alt="Leo Club environmental project"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </section>
   );
