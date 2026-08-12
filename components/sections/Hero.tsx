@@ -7,7 +7,7 @@ import { LiquidButton } from "@/components/ui/liquid-button";
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F2E7] pt-24 pb-12">
+    <section id="#hero" className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F2E7] pt-24 pb-12">
       
       <div className="pointer-events-none absolute -left-[20vw] top-1/2 z-0 h-[calc(100dvh-8px)] w-[calc(100dvh-8px)] -translate-y-1/2 opacity-5 lg:-left-[10vw]">
         <Image
@@ -23,15 +23,16 @@ export default function Hero() {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
           
           <div className="max-w-3xl">
-            <h1 className="text-[3.5rem] font-extrabold leading-[1.05] tracking-tight text-[#07120D] sm:text-6xl lg:text-[5rem] xl:text-[5.5rem]">
+            <h1 className="font-extrabold leading-[1.05] tracking-tight text-[#07120D] text-5xl sm:text-6xl lg:text-[3.25rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
               <span className="block whitespace-nowrap">Purpose Through</span>
               <span className="block text-[#2F5D46]">Service</span>
             </h1>
             
             <p className="mt-8 text-xl leading-relaxed text-[#173D2A] sm:text-2xl">
-              We are the <span className="font-bold">Leo Club of Pannipitiya Metro Titans</span>  
-              <br className="mt-2 block" /> 
-              A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
+              We are the <span className="font-bold">Leo Club of Pannipitiya Metro Titans</span> 
+              <span className="mt-2 block">
+                A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
+              </span>
             </p>
             
             <div className="mt-12 flex flex-wrap items-center gap-5">

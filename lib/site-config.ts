@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Leo Club of Pannipitiya Metro Titans",
-  shortName: "LCPMT Titans",
+  shortName: "LCP Metro Titans",
   domain: "https://titanleos.org",
   tagline: "Leadership. Experience. Opportunity.",
   description:
@@ -11,11 +11,6 @@ export const siteConfig = {
   email: "info@titanleos.org",
   phone: "+94 77 000 0000",
   whatsapp: "+94770000000",
-    address: {
-    line1: "Pannipitiya",
-    line2: "Homagama DS Division, Colombo District",
-    country: "Sri Lanka",
-  },
 
   social: {
     facebook: "https://www.facebook.com/titanleos.sl",
@@ -26,10 +21,9 @@ export const siteConfig = {
 } as const;
 
 export const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/projects", label: "Projects" },
+  { href: "/#hero", label: "Home" },
+  { href: "/#projects", label: "Projects" },
   { href: "/gallery", label: "Gallery" },
   { href: "/join", label: "Join Us" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#contact", label: "Contact" },
 ] as const;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ShinyButton } from "@/components/ui/shiny-button";
 
 export default function JoinCta() {
   return (
@@ -15,21 +16,21 @@ export default function JoinCta() {
             </span>
           </h2>
           <p className="mx-auto max-w-xl text-base sm:text-lg text-[#556B52] leading-relaxed font-medium">
-            We need doers aged 12-30 from Pannipitiya and beyond. Zero experience required - just the guts to step up and serve your community.
+            We need doers aged 18-30 from Pannipitiya and beyond. Zero experience required - just the guts to step up and serve your community.
           </p>
         </div>
 
-        <div className="pt-4">
-          <Link
-            href="/join"
-            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-[#2D3F2B] px-8 py-4 text-sm sm:text-base font-bold text-[#F5F0E8] transition-all duration-300 hover:bg-[#1C2B1E] hover:scale-105 hover:shadow-[0_8px_30px_rgba(45,63,43,0.3)] active:scale-95"
-          >
-            <span>Join the Club</span>
-            <HugeiconsIcon 
-              icon={ArrowRight01Icon} 
-              size={20} 
-              className="transition-transform duration-300 group-hover:translate-x-1.5" 
-            />
+        <div className="pt-4 w-full sm:w-auto">
+          <Link href="/join" className="block w-full sm:w-auto">
+
+            <ShinyButton className="group h-14 w-full px-8 text-base sm:text-lg">
+              Join the Titans
+              <HugeiconsIcon 
+                icon={ArrowRight01Icon} 
+                size={22} 
+                className="ml-2 transition-transform duration-300 group-hover:translate-x-1.5" 
+              />
+            </ShinyButton>
           </Link>
         </div>
 
