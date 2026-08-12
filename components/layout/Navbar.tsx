@@ -36,8 +36,8 @@ export default function Navbar() {
   useEffect(() => {
     const sectionIds = navLinks
       .map((link) => {
-        if (link.href === "/") return "hero";
-        return link.href.replace("/#", "").replace("#", "").replace("/", "");
+        if (link.href.includes("#")) return link.href.split("#")[1];
+        return link.href.replace(/^\/+/, "");
       })
       .filter(Boolean);
 
@@ -149,22 +149,26 @@ export default function Navbar() {
             {navLinks
               .filter((link) => link.label.toLowerCase() !== "join us")
               .map((link) => {
-                const targetId = link.href === "/" 
-                  ? "hero" 
-                  : link.href.replace("/#", "").replace("#", "").replace("/", "");
+                const hashPart = link.href.includes("#") ? link.href.split("#")[1] : null;
+                const targetId = hashPart || link.href.replace(/^\/+/, "");
                 
                 let active = false;
 
-                if (activeSection) {
-                  active = activeSection === targetId;
-                } else {
-                  if (pathname === "/") {
-                    active = targetId === "hero";
-                  } else {
-                    active = pathname === link.href || (pathname.startsWith(link.href) && link.href !== "/");
+                // FIXED: Bulletproof path routing logic
+                if (pathname === "/") {
+                  // If we are on the homepage, only check the scroll-spy section
+                  if (hashPart) {
+                    active = activeSection === targetId;
+                  } else if (link.href === "/#hero") {
+                    active = activeSection === "hero";
                   }
+                } else {
+                  // If we are on another page (like /gallery), match the actual URL path
+                  const basePath = link.href.split("#")[0] || "/";
+                  active = pathname === basePath || (pathname.startsWith(`${basePath}/`) && basePath !== "/");
                 }
                 
+                // Keep everything inactive while on the Hero section
                 if (!pastHero) {
                   active = false;
                 }

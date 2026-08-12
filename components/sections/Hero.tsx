@@ -7,7 +7,7 @@ import { LiquidButton } from "@/components/ui/liquid-button";
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F2E7] pt-24 pb-12">
+    <section id="#hero" className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F2E7] pt-24 pb-12">
       
       <div className="pointer-events-none absolute -left-[20vw] top-1/2 z-0 h-[calc(100dvh-8px)] w-[calc(100dvh-8px)] -translate-y-1/2 opacity-5 lg:-left-[10vw]">
         <Image
