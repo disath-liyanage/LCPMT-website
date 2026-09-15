@@ -56,7 +56,7 @@ export default function Hero() {
           <div className="flex w-full flex-col gap-5">
             <div className="relative w-full overflow-hidden rounded-3xl bg-[#E8D8B8] aspect-[4/3] lg:aspect-[16/11]">
               <Image
-                src="/images/hero-1.jpeg"
+                src="/images/hero-4.jpeg"
                 alt="Leo Club community service project"
                 fill
                 priority
