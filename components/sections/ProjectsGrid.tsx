@@ -18,7 +18,6 @@ const categories: (ProjectCategory | "All")[] = [
   "Public Relations",
   "Sports & Recreation",
   "Membership Development",
-  "Youth Development",
 ];
 
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
