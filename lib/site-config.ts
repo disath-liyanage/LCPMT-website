@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Leo Club of Pannipitiya Metro Titans",
-  shortName: "LCP Metro Titans",
+  shortName: "LC Pannipitiya Metro Titans",
   domain: "https://titanleos.org",
   tagline: "Leadership. Experience. Opportunity.",
   description:

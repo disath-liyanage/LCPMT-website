@@ -18,6 +18,7 @@ const categories: (ProjectCategory | "All")[] = [
   "Public Relations",
   "Sports & Recreation",
   "Membership Development",
+  "Youth Development",
 ];
 
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
@@ -69,7 +70,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap gap-3 mb-8">
+      <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
         {categories.map((category) => (
           <Button
             key={category}
