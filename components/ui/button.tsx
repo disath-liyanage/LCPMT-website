@@ -18,6 +18,20 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        
+        frosted: 
+          "bg-black/5 border border-black/10 backdrop-blur-xl shadow-sm text-foreground hover:bg-black/10 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10 transition-all duration-300",
+        "frosted-active": 
+          "bg-black/15 border border-black/20 backdrop-blur-xl shadow-sm text-foreground font-semibold dark:bg-white/15 dark:border-white/20 transition-all duration-300",
+        "frosted-nav":
+          "bg-white/50 backdrop-blur-2xl backdrop-saturate-200 border border-white/60 shadow-lg text-black hover:bg-white/80 hover:shadow-xl dark:bg-black/50 dark:border-white/20 dark:text-white dark:hover:bg-black/70 transition-all duration-300 [&_svg]:size-8 [&_svg]:shrink-0",
+        "frosted-pill":
+          "bg-white/70 backdrop-blur-xl backdrop-saturate-200 border border-white/60 shadow-md text-black font-semibold dark:bg-black/60 dark:border-white/20 dark:text-white transition-all duration-300",
+        "frosted-filter":
+          "bg-white/50 hover:bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-neutral-600 hover:text-black dark:bg-black/40 dark:border-white/10 dark:text-neutral-400 dark:hover:text-white transition-all duration-300",
+        "frosted-filter-active":
+          "bg-black/90 backdrop-blur-xl border border-black text-white font-semibold shadow-lg hover:shadow-xl dark:bg-white/90 dark:border-white dark:text-black transition-all duration-300",
+
       },
       size: {
         default:

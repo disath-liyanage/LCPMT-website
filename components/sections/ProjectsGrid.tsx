@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon, Cancel01Icon, LinkSquare01Icon, Calendar01Icon, Location01Icon } from "@hugeicons/core-free-icons";
 import type { Project, ProjectCategory } from "@/lib/data";
+import { Button } from "@/components/ui/button";
 
 const categories: (ProjectCategory | "All")[] = [
   "All",
@@ -18,6 +19,7 @@ const categories: (ProjectCategory | "All")[] = [
   "Sports & Recreation",
   "Membership Development",
 ];
+
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState<(typeof categories)[number]>("All");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -67,11 +69,16 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap gap-3 mb-8">
         {categories.map((category) => (
-          <button key={category} type="button" onClick={() => { setActive(category); closeProject(); }} className={cn("rounded-full border px-4 py-2 text-sm font-medium transition-colors", active === category ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground/70 hover:bg-accent")}>
+          <Button
+            key={category}
+            size="default"
+            variant={active === category ? "frosted-filter-active" : "frosted-filter"}
+            onClick={() => { setActive(category); closeProject(); }}
+          >
             {category}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -89,9 +96,15 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
       {activeProject && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:px-20">
-          <button onClick={() => goToProject(selectedIndex! - 1)} disabled={selectedIndex === 0} className="hidden md:flex absolute left-4 z-[110] p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-          </button>
+          <Button 
+            variant="frosted-nav"
+            size="icon-lg"
+            onClick={() => goToProject(selectedIndex! - 1)} 
+            disabled={selectedIndex === 0} 
+            className="hidden md:flex absolute left-4 z-[110]"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
+          </Button>
 
           <div className="relative flex flex-col md:flex-row w-full max-w-6xl h-[90vh] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
             <button onClick={closeProject} className="absolute top-4 right-4 z-[110] p-2 bg-background/80 hover:bg-background border border-border rounded-full backdrop-blur-md transition-colors">
@@ -117,18 +130,30 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
             <div className="w-full md:w-1/2 h-[55%] md:h-full flex flex-col relative bg-card">
               <div className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
-                <div className="flex flex-wrap items-center gap-3 mb-2 pr-10">
-                  <span className="px-3 py-1 bg-secondary text-secondary-foreground text-xs font-bold rounded-full uppercase tracking-wider">{activeProject.category}</span>
+                
+                <div className="flex flex-wrap items-center gap-3 mb-4 pr-10">
+                  <Button size="xs" variant="frosted-filter-active" className="uppercase font-bold tracking-wider cursor-default pointer-events-none">
+                    {activeProject.category}
+                  </Button>
+
                   {activeProject.collaborators && activeProject.collaborators.length > 0 ? (
                     activeProject.collaborators.map((collab, idx) => (
-                      <a key={idx} href={collab.link || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-full transition-colors">
-                        {collab.name} {collab.link && <HugeiconsIcon icon={LinkSquare01Icon} size={14} />}
+                      <a href={collab.link || "#"} target="_blank" rel="noopener noreferrer" key={idx}>
+                        <Button size="xs" variant="secondary" className="cursor-pointer">
+                          <span className="flex items-center gap-1.5 font-bold">
+                            {collab.name} {collab.link && <HugeiconsIcon icon={LinkSquare01Icon} size={12} />}
+                          </span>
+                        </Button>
                       </a>
                     ))
                   ) : (
                     activeProject.collaborative_club && (
-                      <a href={activeProject.collaborative_club_link || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-full transition-colors">
-                        {activeProject.collaborative_club} {activeProject.collaborative_club_link && <HugeiconsIcon icon={LinkSquare01Icon} size={14} />}
+                      <a href={activeProject.collaborative_club_link || "#"} target="_blank" rel="noopener noreferrer">
+                        <Button size="xs" variant="secondary" className="cursor-pointer">
+                          <span className="flex items-center gap-1.5 font-bold">
+                            {activeProject.collaborative_club} {activeProject.collaborative_club_link && <HugeiconsIcon icon={LinkSquare01Icon} size={12} />}
+                          </span>
+                        </Button>
                       </a>
                     )
                   )}
@@ -157,9 +182,15 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
             </div>
           </div>
 
-          <button onClick={() => goToProject(selectedIndex! + 1)} disabled={selectedIndex === filtered.length - 1} className="hidden md:flex absolute right-4 z-[110] p-4 bg-card/50 hover:bg-card border border-border rounded-full shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-            <HugeiconsIcon icon={ArrowRight01Icon} size={28} />
-          </button>
+          <Button 
+            variant="frosted-nav" 
+            size="icon-lg"
+            onClick={() => goToProject(selectedIndex! + 1)} 
+            disabled={selectedIndex === filtered.length - 1} 
+            className="hidden md:flex absolute right-4 z-[110]"
+          >
+            <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
+          </Button>
         </div>
       )}
     </section>

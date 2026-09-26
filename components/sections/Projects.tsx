@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { getFeaturedProjects } from "@/app/actions/projects";
 import FeaturedCarousel from "./FeaturedCarousel";
+import { OriginButton } from "@/components/ui/origin-button";
 
 export default async function FeaturedProjects() {
   const featuredProjects = await getFeaturedProjects();
@@ -24,16 +25,15 @@ export default async function FeaturedProjects() {
             </h2>
           </div>
           
-          <Link 
-            href="/projects" 
-            className="group flex items-center gap-2 text-sm font-semibold tracking-wide text-primary hover:text-primary/80 transition-colors pb-1"
-          >
-            <span>View All Projects</span>
-            <HugeiconsIcon 
-              icon={ArrowRight01Icon} 
-              size={18} 
-              className="transition-transform duration-300 group-hover:translate-x-1.5" 
-            />
+          <Link href="/projects">
+            <OriginButton className="group flex items-center gap-2">
+              <span>View All Projects</span>
+              <HugeiconsIcon 
+                icon={ArrowRight01Icon} 
+                size={18} 
+                className="transition-transform duration-300 group-hover:translate-x-1.5" 
+              />
+            </OriginButton>
           </Link>
         </div>
 

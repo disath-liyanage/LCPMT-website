@@ -7,6 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import type { Project } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default function FeaturedCarousel({ projects }: { projects: Project[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -42,18 +43,19 @@ export default function FeaturedCarousel({ projects }: { projects: Project[] }) 
 
   return (
     <div className="relative group/carousel w-full">
-      {projects.length > 3 && (
-        <button 
-          onClick={() => scroll("left")}
-          disabled={!canScrollLeft}
-          className={cn(
-            "absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background border border-border rounded-full shadow-lg transition-all duration-300 hidden lg:flex",
-            !canScrollLeft ? "opacity-0 pointer-events-none" : "opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
-          )}
-        >
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
-        </button>
-      )}
+      <Button 
+        variant="frosted-nav"
+        onClick={() => scroll("left")}
+        disabled={!canScrollLeft}
+        className={cn(
+          "absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full hidden lg:flex items-center justify-center transition-all duration-300",
+          !canScrollLeft 
+            ? "!opacity-0 pointer-events-none" 
+            : "opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
+        )}
+      >
+        <HugeiconsIcon icon={ArrowLeft01Icon} />
+      </Button>
 
       <div 
         ref={scrollRef}
@@ -71,18 +73,19 @@ export default function FeaturedCarousel({ projects }: { projects: Project[] }) 
         ))}
       </div>
 
-      {projects.length > 3 && (
-        <button 
-          onClick={() => scroll("right")}
-          disabled={!canScrollRight}
-          className={cn(
-            "absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background border border-border rounded-full shadow-lg transition-all duration-300 hidden lg:flex",
-            !canScrollRight ? "opacity-0 pointer-events-none" : "opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
-          )}
-        >
-          <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
-        </button>
-      )}
+      <Button 
+        variant="frosted-nav"
+        onClick={() => scroll("right")}
+        disabled={!canScrollRight}
+        className={cn(
+          "absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full hidden lg:flex items-center justify-center transition-all duration-300",
+          !canScrollRight 
+            ? "!opacity-0 pointer-events-none" 
+            : "opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
+        )}
+      >
+        <HugeiconsIcon icon={ArrowRight01Icon} />
+      </Button>
     </div>
   );
 }
