@@ -6,21 +6,270 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon, Cancel01Icon, LinkSquare01Icon, Calendar01Icon, Location01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, ArrowRight01Icon, Cancel01Icon, LinkSquare01Icon, Calendar01Icon, Location01Icon, ImageNotFound01Icon } from "@hugeicons/core-free-icons";
 import type { Project, ProjectCategory } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence, LayoutGroup, type Transition } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup, type Transition, useMotionValue } from "framer-motion";
 
 const categories: (ProjectCategory | "All")[] = [
   "All", "Community Service", "International Service", "Digital Transformation",
   "Public Relations", "Sports & Recreation", "Membership Development",
 ];
+
 const swipeConfidenceThreshold = 10000;
 const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
 const morphTransition: Transition = { type: "spring", damping: 25, stiffness: 250, mass: 0.9 };
+const AUTOPLAY_MS = 5000;
 const projectKey = (project: Project) => String(project.id || project.slug);
 const cardDomId = (project: Project) => `grid-card-${encodeURIComponent(projectKey(project))}`;
 const projectLayoutId = (project: Project) => `project-container-${projectKey(project)}`;
+
+/**
+ * Full-screen lightbox for a project's photos.
+ * Uses a separated motion wrapper for swipe and native inline styles for pan/zoom
+ * to prevent conflicting states (fixing the "moving everywhere" bug).
+ */
+function PhotoLightbox({
+  images,
+  index,
+  projectTitle,
+  brokenImages,
+  onImageError,
+  onNavigate,
+  onClose,
+}: {
+  images: string[];
+  index: number;
+  projectTitle: string;
+  brokenImages: Set<number>;
+  onImageError: (idx: number) => void;
+  onNavigate: (nextIndex: number) => void;
+  onClose: () => void;
+}) {
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const pinchRef = useRef<{ startDistance: number; startScale: number } | null>(null);
+  const touchPanRef = useRef<{ startX: number; startY: number; startPos: { x: number; y: number } } | null>(null);
+  const mousePanRef = useRef<{ startX: number; startY: number; startPos: { x: number; y: number } } | null>(null);
+  const lastTapRef = useRef(0);
+
+  useEffect(() => {
+    setScale(1);
+    setPos({ x: 0, y: 0 });
+  }, [index]);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
+  const getDistance = (touches: TouchList) => {
+    const a = touches[0];
+    const b = touches[1];
+    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  };
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        pinchRef.current = { startDistance: getDistance(e.touches), startScale: scale };
+      } else if (e.touches.length === 1 && scale > 1) {
+        touchPanRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, startPos: pos };
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        e.preventDefault();
+        const newDistance = getDistance(e.touches);
+        const nextScale = Math.min(4, Math.max(1, pinchRef.current.startScale * (newDistance / pinchRef.current.startDistance)));
+        setScale(nextScale);
+        if (nextScale === 1) setPos({ x: 0, y: 0 });
+      } else if (e.touches.length === 1 && touchPanRef.current) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - touchPanRef.current.startX;
+        const dy = e.touches[0].clientY - touchPanRef.current.startY;
+        setPos({ x: touchPanRef.current.startPos.x + dx, y: touchPanRef.current.startPos.y + dy });
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) pinchRef.current = null;
+      if (e.touches.length < 1) touchPanRef.current = null;
+    };
+
+    el.addEventListener("touchstart", handleTouchStart, { passive: false });
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchend", handleTouchEnd);
+    el.addEventListener("touchcancel", handleTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [scale, pos]);
+
+  const toggleZoom = () => {
+    if (scale > 1) {
+      setScale(1);
+      setPos({ x: 0, y: 0 });
+    } else {
+      setScale(2.5);
+    }
+  };
+
+  const handleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) toggleZoom();
+    lastTapRef.current = now;
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (scale <= 1) return;
+    mousePanRef.current = { startX: e.clientX, startY: e.clientY, startPos: pos };
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!mousePanRef.current) return;
+    const dx = e.clientX - mousePanRef.current.startX;
+    const dy = e.clientY - mousePanRef.current.startY;
+    setPos({ x: mousePanRef.current.startPos.x + dx, y: mousePanRef.current.startPos.y + dy });
+  };
+  const stopMousePan = () => { mousePanRef.current = null; };
+
+  const canSwipe = scale === 1;
+  const hasError = brokenImages.has(index);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${projectTitle} photo viewer`}
+      className="fixed inset-0 z-[200] bg-black/95 flex flex-col"
+      onClick={onClose}
+    >
+      <div className="flex items-center justify-between px-4 py-3 shrink-0 z-50" onClick={(e) => e.stopPropagation()}>
+        {images.length > 1 ? (
+          <span className="bg-white/10 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full tabular-nums">
+            {index + 1} / {images.length}
+          </span>
+        ) : <span />}
+        <button
+          ref={closeButtonRef}
+          onClick={onClose}
+          aria-label="Close photo viewer"
+          className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all hover:scale-110"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={22} />
+        </button>
+      </div>
+
+      <div
+        ref={containerRef}
+        className="relative flex-1 overflow-hidden flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {images.length > 1 && (
+          <button
+            onClick={() => index > 0 && onNavigate(index - 1)}
+            disabled={index === 0}
+            aria-label="Previous photo"
+            className={cn("absolute left-2 sm:left-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all", index === 0 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={22} />
+          </button>
+        )}
+
+        <motion.div
+          className="w-full h-full absolute inset-0 flex items-center justify-center"
+          drag={canSwipe ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.8}
+          onDragEnd={(_, { offset, velocity }) => {
+            if (!canSwipe) return;
+            const swipe = swipePower(offset.x, velocity.x);
+            if (swipe < -swipeConfidenceThreshold && index < images.length - 1) onNavigate(index + 1);
+            else if (swipe > swipeConfidenceThreshold && index > 0) onNavigate(index - 1);
+          }}
+        >
+          {hasError ? (
+            <div className="flex flex-col items-center gap-2 text-white/40">
+              <HugeiconsIcon icon={ImageNotFound01Icon} size={40} />
+              <span className="text-sm">Image unavailable</span>
+            </div>
+          ) : (
+            <motion.img
+              key={index}
+              src={images[index]}
+              alt={`${projectTitle} photo ${index + 1}`}
+              onClick={handleTap}
+              onDoubleClick={toggleZoom}
+              onError={() => onImageError(index)}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={stopMousePan}
+              onMouseLeave={stopMousePan}
+              style={{ x: pos.x, y: pos.y, scale, touchAction: "none" }}
+              className={cn("max-w-full max-h-full object-contain px-2", scale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in")}
+              draggable={false}
+            />
+          )}
+        </motion.div>
+
+        {images.length > 1 && (
+          <button
+            onClick={() => index < images.length - 1 && onNavigate(index + 1)}
+            disabled={index === images.length - 1}
+            aria-label="Next photo"
+            className={cn("absolute right-2 sm:right-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all", index === images.length - 1 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
+          >
+            <HugeiconsIcon icon={ArrowRight01Icon} size={22} />
+          </button>
+        )}
+      </div>
+
+      {images.length > 1 && (
+        <div 
+          className="h-auto w-full flex gap-3 justify-center items-center overflow-x-auto px-4 pb-6 pt-4 shrink-0 bg-black/50 z-50 border-t border-white/5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {images.map((imgSrc, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => onNavigate(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={cn(
+                "relative h-12 w-12 sm:h-14 sm:w-14 rounded-lg overflow-hidden transition-all duration-300 shrink-0 cursor-pointer",
+                idx === index
+                  ? "scale-110 ring-2 ring-white/80 shadow-lg opacity-100"
+                  : "opacity-50 hover:opacity-100"
+              )}
+            >
+              {brokenImages.has(idx) ? (
+                <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                  <HugeiconsIcon icon={ImageNotFound01Icon} size={16} className="text-white/40" />
+                </div>
+              ) : (
+                <img
+                  src={imgSrc}
+                  alt={`Thumbnail ${idx + 1}`}
+                  className="object-cover w-full h-full"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState<(typeof categories)[number]>("All");
@@ -29,11 +278,12 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [imageDirection, setImageDirection] = useState(0);
   const [projectSlideDirection, setProjectSlideDirection] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [navFlash, setNavFlash] = useState<"left" | "right" | null>(null);
   const [showCollabs, setShowCollabs] = useState(false);
+  const [isHoveringImage, setIsHoveringImage] = useState(false);
+  const [brokenImages, setBrokenImages] = useState<Set<number>>(new Set());
 
   const [sessionLayoutId, setSessionLayoutId] = useState<string | null>(null);
 
@@ -42,16 +292,21 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     returnProjectKey: "",
     returnLayoutId: "",
   });
+
   const getGridLayoutId = useCallback((project: Project) =>
     projectKey(project) === gridLayout.returnProjectKey
       ? gridLayout.returnLayoutId
       : `${projectLayoutId(project)}-${gridLayout.generation}`,
   [gridLayout]);
+
   const layoutGroupId = useId();
   const collabsRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const initializedUrl = useRef(false);
   const [urlReady, setUrlReady] = useState(false);
   const closingRef = useRef(false);
+
+  const dragX = useMotionValue(0);
 
   useEffect(() => {
     if (initializedUrl.current) return;
@@ -81,7 +336,28 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     const main = activeProject.main_image;
     return main ? [main, ...images.filter((img) => img !== main)] : images;
   }, [activeProject]);
+
   const hasCollabs = !!activeProject && (!!activeProject.collaborators?.length || !!activeProject.collaborative_club);
+
+  useEffect(() => {
+    if (!isOpen || !activeProject || lightboxOpen || isHoveringImage || carouselImages.length <= 1) return;
+    const intervalRef = setInterval(() => {
+      const x = dragX.get();
+      if (x === 0) {
+        setActiveImageIndex((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
+      }
+    }, AUTOPLAY_MS);
+    return () => clearInterval(intervalRef);
+  }, [isOpen, activeProject, lightboxOpen, isHoveringImage, dragX, carouselImages.length, activeImageIndex]);
+
+  const onDragEnd = () => {
+    const x = dragX.get();
+    if (x <= -50 && activeImageIndex < carouselImages.length - 1) {
+      setActiveImageIndex((prev) => prev + 1);
+    } else if (x >= 50 && activeImageIndex > 0) {
+      setActiveImageIndex((prev) => prev - 1);
+    }
+  };
 
   const openProject = useCallback((index: number) => {
     const project = filtered[index];
@@ -90,10 +366,10 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     setSelectedIndex(index);
     setActiveProject(project);
     setActiveImageIndex(0);
-    setImageDirection(0);
     setProjectSlideDirection(0);
-    setIsZoomed(false);
+    setLightboxOpen(false);
     setShowCollabs(false);
+    setBrokenImages(new Set());
     setIsOpen(true);
   }, [filtered, getGridLayoutId]);
 
@@ -109,7 +385,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       returnLayoutId: sessionLayoutId,
     }));
     setIsOpen(false);
-    setIsZoomed(false);
+    setLightboxOpen(false);
     setShowCollabs(false);
   }, [isOpen, activeProject, sessionLayoutId]);
 
@@ -129,45 +405,65 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     };
   }, [modalPresent]);
 
+  useEffect(() => {
+    if (isOpen) closeButtonRef.current?.focus();
+  }, [isOpen]);
+
   const goToProject = useCallback((index: number) => {
     if (index < 0 || index >= filtered.length || closingRef.current) return;
     setProjectSlideDirection(selectedIndex !== null && index > selectedIndex ? 1 : -1);
     setSelectedIndex(index);
     setActiveProject(filtered[index]);
     setActiveImageIndex(0);
-    setImageDirection(0);
-    setIsZoomed(false);
+    setLightboxOpen(false);
     setShowCollabs(false);
+    setBrokenImages(new Set());
   }, [filtered, selectedIndex]);
-
-  const paginateImage = (direction: number) => {
-    if (carouselImages.length < 2) return;
-    setImageDirection(direction);
-    setActiveImageIndex((prev) => (prev + direction + carouselImages.length) % carouselImages.length);
-    setIsZoomed(false);
-  };
 
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeProject();
-      if (selectedIndex === null) return;
-      if (e.key === "ArrowRight" && selectedIndex < filtered.length - 1) {
-        setNavFlash("right");
-        window.setTimeout(() => setNavFlash(null), 200);
-        goToProject(selectedIndex + 1);
+      if (lightboxOpen) {
+        if (e.key === "Escape") {
+          setLightboxOpen(false);
+        } else if (e.key === "ArrowRight" && activeImageIndex < carouselImages.length - 1) {
+          setActiveImageIndex((prev) => prev + 1);
+        } else if (e.key === "ArrowLeft" && activeImageIndex > 0) {
+          setActiveImageIndex((prev) => prev - 1);
+        }
+        return;
       }
-      if (e.key === "ArrowLeft" && selectedIndex > 0) {
-        setNavFlash("left");
-        window.setTimeout(() => setNavFlash(null), 200);
-        goToProject(selectedIndex - 1);
+
+      if (e.key === "Escape") {
+        closeProject();
+        return;
+      }
+      if (selectedIndex === null) return;
+
+      if (e.key === "ArrowRight") {
+        if (activeImageIndex < carouselImages.length - 1) {
+          setActiveImageIndex((prev) => prev + 1);
+        } else if (selectedIndex < filtered.length - 1) {
+          setNavFlash("right");
+          window.setTimeout(() => setNavFlash(null), 200);
+          goToProject(selectedIndex + 1);
+        }
+      }
+      if (e.key === "ArrowLeft") {
+        if (activeImageIndex > 0) {
+          setActiveImageIndex((prev) => prev - 1);
+        } else if (selectedIndex > 0) {
+          setNavFlash("left");
+          window.setTimeout(() => setNavFlash(null), 200);
+          goToProject(selectedIndex - 1);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, selectedIndex, closeProject, goToProject, filtered.length]);
+  }, [isOpen, selectedIndex, closeProject, goToProject, filtered.length, lightboxOpen, activeImageIndex, carouselImages.length]);
 
   const handleToggleCollabs = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -219,11 +515,11 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[110] pointer-events-none flex items-center justify-between px-2 sm:px-8">
             <Button variant="frosted-nav" aria-label="Previous project" onClick={(e) => { e.stopPropagation(); goToProject(selectedIndex - 1); }}
-              disabled={selectedIndex === 0} className={cn("flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg", selectedIndex === 0 ? "!opacity-0 pointer-events-none" : "hover:scale-110", navFlash === "left" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30")}>
+              disabled={selectedIndex === 0 || lightboxOpen} className={cn("flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg", (selectedIndex === 0 || lightboxOpen) ? "!opacity-0 pointer-events-none" : "hover:scale-110", navFlash === "left" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30")}>
               <HugeiconsIcon icon={ArrowLeft01Icon} />
             </Button>
             <Button variant="frosted-nav" aria-label="Next project" onClick={(e) => { e.stopPropagation(); goToProject(selectedIndex + 1); }}
-              disabled={selectedIndex === filtered.length - 1} className={cn("flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg", selectedIndex === filtered.length - 1 ? "!opacity-0 pointer-events-none" : "hover:scale-110", navFlash === "right" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30")}>
+              disabled={selectedIndex === filtered.length - 1 || lightboxOpen} className={cn("flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg", (selectedIndex === filtered.length - 1 || lightboxOpen) ? "!opacity-0 pointer-events-none" : "hover:scale-110", navFlash === "right" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30")}>
               <HugeiconsIcon icon={ArrowRight01Icon} />
             </Button>
           </motion.div>
@@ -235,15 +531,18 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
           setActiveProject(null);
           setSelectedIndex(null);
           setSessionLayoutId(null);
-          setIsZoomed(false);
+          setLightboxOpen(false);
           setShowCollabs(false);
           closingRef.current = false;
         }}>
           {isOpen && activeProject && selectedIndex !== null && (
             <motion.div key="project-modal" layoutId={sessionLayoutId || undefined}
               transition={morphTransition}
+              role="dialog"
+              aria-modal="true"
+              aria-label={activeProject.title}
               className="pointer-events-auto relative w-full max-w-6xl h-full sm:h-[90vh] bg-card border-0 sm:border border-border rounded-none sm:rounded-2xl shadow-2xl overflow-hidden">
-              <button onClick={closeProject} aria-label="Close project"
+              <button ref={closeButtonRef} onClick={closeProject} aria-label="Close project"
                 className="absolute top-4 right-4 z-[120] p-2 bg-black/50 hover:bg-black text-white border border-white/10 rounded-full backdrop-blur-md transition-all hover:scale-110 hover:rotate-90">
                 <HugeiconsIcon icon={Cancel01Icon} size={24} />
               </button>
@@ -258,44 +557,111 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                   initial="enter" animate="center" exit="exit"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="absolute inset-0 flex flex-col md:flex-row bg-card"
-                  drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={1}
+                  drag={!lightboxOpen ? "x" : false} dragConstraints={{ left: 0, right: 0 }} dragElastic={1}
                   onDragEnd={(_, { offset, velocity }) => {
+                    if (lightboxOpen) return;
                     const swipe = swipePower(offset.x, velocity.x);
                     if (swipe < -swipeConfidenceThreshold && selectedIndex < filtered.length - 1) goToProject(selectedIndex + 1);
                     else if (swipe > swipeConfidenceThreshold && selectedIndex > 0) goToProject(selectedIndex - 1);
                   }}>
-                  <div className="relative w-full md:w-1/2 h-[45%] md:h-full bg-black flex items-center justify-center group overflow-hidden">
+
+                  <div
+                    className="relative w-full md:w-1/2 h-[45%] md:h-full bg-black flex flex-col items-center justify-center group overflow-hidden"
+                    onMouseEnter={() => setIsHoveringImage(true)}
+                    onMouseLeave={() => setIsHoveringImage(false)}
+                  >
                     {carouselImages.length > 0 ? (
-                      <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                        <AnimatePresence initial={false} custom={imageDirection}>
-                          <motion.img key={activeImageIndex} src={carouselImages[activeImageIndex]} custom={imageDirection}
-                            variants={{
-                              enter: (dir: number) => ({ x: dir > 0 ? 500 : -500, opacity: 0 }),
-                              center: { zIndex: 1, x: 0, opacity: 1 },
-                              exit: (dir: number) => ({ zIndex: 0, x: dir < 0 ? 500 : -500, opacity: 0 }),
-                            }}
-                            initial="enter" animate="center" exit="exit"
-                            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-                            drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={1}
-                            onDragEnd={(_, { offset, velocity }) => {
-                              const swipe = swipePower(offset.x, velocity.x);
-                              if (swipe < -swipeConfidenceThreshold) paginateImage(1);
-                              else if (swipe > swipeConfidenceThreshold) paginateImage(-1);
-                            }}
-                            onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
-                            className={cn("absolute w-full h-full", isZoomed ? "object-contain cursor-zoom-out" : "object-cover cursor-zoom-in")}
-                            alt={`${activeProject.title} image ${activeImageIndex + 1}`} />
-                        </AnimatePresence>
+                      <>
+                        <div className="absolute top-4 left-4 z-20 pointer-events-none">
+                          <span className="bg-black/60 text-white/90 text-xs font-medium px-4 py-1.5 rounded-full backdrop-blur-md shadow-lg border border-white/10 tracking-wide">
+                            Click image to expand
+                          </span>
+                        </div>
+
                         {carouselImages.length > 1 && (
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm z-10">
-                            {carouselImages.map((_, i) => (
-                              <button key={i} aria-label={`Show image ${i + 1}`}
-                                className={cn("h-2 rounded-full transition-all duration-300 cursor-pointer", i === activeImageIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/90")}
-                                onClick={(e) => { e.stopPropagation(); setImageDirection(i > activeImageIndex ? 1 : -1); setActiveImageIndex(i); setIsZoomed(false); }} />
+                          <div className="absolute top-4 right-4 z-20 pointer-events-none">
+                            <span className="bg-black/60 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg border border-white/10 tabular-nums">
+                              {activeImageIndex + 1} / {carouselImages.length}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="relative w-full flex-1 overflow-hidden flex items-center">
+                          <motion.div
+                            drag={!lightboxOpen ? "x" : false}
+                            dragConstraints={{ left: 0, right: 0 }}
+                            style={{ x: !lightboxOpen ? dragX : 0 }}
+                            animate={{ translateX: `-${activeImageIndex * 100}%` }}
+                            transition={lightboxOpen ? { duration: 0 } : { type: "spring", mass: 3, stiffness: 400, damping: 50 }}
+                            onDragEnd={onDragEnd}
+                            className="flex w-full h-full items-center"
+                          >
+                            {carouselImages.map((imgSrc, idx) => (
+                              <motion.div
+                                key={idx}
+                                animate={{
+                                  scale: activeImageIndex === idx ? 0.95 : 0.85,
+                                  opacity: activeImageIndex === idx ? 1 : 0.4,
+                                }}
+                                transition={{ type: "spring", mass: 3, stiffness: 400, damping: 50 }}
+                                className="relative shrink-0 flex items-center justify-center cursor-pointer w-full h-full p-4 sm:p-8"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (activeImageIndex === idx) setLightboxOpen(true);
+                                  else setActiveImageIndex(idx);
+                                }}
+                              >
+                                {brokenImages.has(idx) ? (
+                                  <div className="flex flex-col items-center gap-2 text-white/40">
+                                    <HugeiconsIcon icon={ImageNotFound01Icon} size={32} />
+                                    <span className="text-xs">Image unavailable</span>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={imgSrc}
+                                    alt={`${activeProject.title} image ${idx + 1}`}
+                                    loading={Math.abs(idx - activeImageIndex) <= 1 ? "eager" : "lazy"}
+                                    onError={() => setBrokenImages((prev) => new Set(prev).add(idx))}
+                                    className="w-full h-full object-cover rounded-2xl shadow-xl cursor-zoom-in transition-all duration-300"
+                                  />
+                                )}
+                              </motion.div>
+                            ))}
+                          </motion.div>
+                        </div>
+
+                        {carouselImages.length > 1 && (
+                          <div className="h-auto w-full flex gap-3 justify-center items-center overflow-x-auto px-4 pb-6 pt-2 z-10">
+                            {carouselImages.map((imgSrc, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setActiveImageIndex(idx); }}
+                                aria-label={`Go to slide ${idx + 1}`}
+                                aria-current={idx === activeImageIndex}
+                                className={cn(
+                                  "relative h-12 w-12 sm:h-14 sm:w-14 rounded-lg overflow-hidden transition-all duration-300 shrink-0 cursor-pointer",
+                                  idx === activeImageIndex
+                                    ? "scale-110 ring-2 ring-white/80 shadow-lg opacity-100"
+                                    : "opacity-50 hover:opacity-100"
+                                )}
+                              >
+                                {brokenImages.has(idx) ? (
+                                  <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                    <HugeiconsIcon icon={ImageNotFound01Icon} size={16} className="text-white/40" />
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={imgSrc}
+                                    alt={`Thumbnail ${idx + 1}`}
+                                    className="object-cover w-full h-full"
+                                  />
+                                )}
+                              </button>
                             ))}
                           </div>
                         )}
-                      </div>
+                      </>
                     ) : <span className="text-white/50">No images</span>}
                   </div>
 
@@ -362,6 +728,20 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
           )}
         </AnimatePresence>
       </motion.div>
+
+      <AnimatePresence>
+        {lightboxOpen && activeProject && carouselImages.length > 0 && (
+          <PhotoLightbox
+            images={carouselImages}
+            index={activeImageIndex}
+            projectTitle={activeProject.title}
+            brokenImages={brokenImages}
+            onImageError={(idx) => setBrokenImages((prev) => new Set(prev).add(idx))}
+            onNavigate={(next) => setActiveImageIndex(next)}
+            onClose={() => setLightboxOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </section>
     </LayoutGroup>
   );
