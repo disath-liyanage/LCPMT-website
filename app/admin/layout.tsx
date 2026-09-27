@@ -1,12 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button"; 
 import { LayoutDashboard, Mail, LogOut, Home, Users, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
       <aside className="w-64 border-r border-border bg-card flex flex-col flex-shrink-0">
@@ -17,7 +23,7 @@ export default function AdminLayout({
         <nav className="flex-1 flex flex-col gap-2 p-4 overflow-y-auto">
           <Link 
             href="/admin" 
-            className={buttonVariants({ variant: "ghost", className: "justify-start" })}
+            className={cn(buttonVariants({ variant: pathname === "/admin" ? "default" : "ghost", className: "justify-start" }))}
           >
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Project Dashboard
@@ -25,7 +31,7 @@ export default function AdminLayout({
           
           <Link 
             href="/admin/email" 
-            className={buttonVariants({ variant: "ghost", className: "justify-start" })}
+            className={cn(buttonVariants({ variant: pathname.startsWith("/admin/email") ? "default" : "ghost", className: "justify-start" }))}
           >
             <Mail className="mr-2 h-4 w-4" />
             Email Sender
@@ -33,7 +39,7 @@ export default function AdminLayout({
 
            <Link 
             href="/admin/members" 
-            className={buttonVariants({ variant: "ghost", className: "justify-start" })}
+            className={cn(buttonVariants({ variant: pathname.startsWith("/admin/members") ? "default" : "ghost", className: "justify-start" }))}
           >
             <Users className="mr-2 h-4 w-4" />
             Members & Approvals
@@ -41,7 +47,7 @@ export default function AdminLayout({
 
           <Link 
             href="/admin/newsletters" 
-            className={buttonVariants({ variant: "ghost", className: "justify-start" })}
+            className={cn(buttonVariants({ variant: pathname.startsWith("/admin/newsletters") ? "default" : "ghost", className: "justify-start" }))}
           >
             <BookOpen className="mr-2 h-4 w-4" />
             Newsletters

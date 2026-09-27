@@ -154,21 +154,17 @@ export default function Navbar() {
                 
                 let active = false;
 
-                // FIXED: Bulletproof path routing logic
                 if (pathname === "/") {
-                  // If we are on the homepage, only check the scroll-spy section
                   if (hashPart) {
                     active = activeSection === targetId;
                   } else if (link.href === "/#hero") {
                     active = activeSection === "hero";
                   }
                 } else {
-                  // If we are on another page (like /gallery), match the actual URL path
                   const basePath = link.href.split("#")[0] || "/";
                   active = pathname === basePath || (pathname.startsWith(`${basePath}/`) && basePath !== "/");
                 }
                 
-                // Keep everything inactive while on the Hero section
                 if (!pastHero) {
                   active = false;
                 }
