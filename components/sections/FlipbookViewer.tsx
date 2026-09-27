@@ -13,7 +13,7 @@ interface FlipbookViewerProps {
   year: number
 }
 
-export default function FlipbookViewer({ pages, title, month, year }: FlipbookViewerProps) {
+export default function FlipbookViewer({ pages = [], title, month, year }: FlipbookViewerProps) {
   const bookRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
