@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import HTMLFlipBook from "react-pageflip"
-import { ChevronLeft, ZoomIn, ZoomOut, Maximize, Minimize, Undo, Redo } from "lucide-react"
+import { ChevronLeft, ZoomIn, ZoomOut, Maximize, Minimize, Redo, Undo } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
@@ -13,7 +13,7 @@ interface FlipbookViewerProps {
   year: number
 }
 
-export default function FlipbookViewer({ pages = [], title, month, year }: FlipbookViewerProps) {
+export default function FlipbookViewer({ pages, title, month, year }: FlipbookViewerProps) {
   const bookRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -52,6 +52,24 @@ export default function FlipbookViewer({ pages = [], title, month, year }: Flipb
     }
     document.addEventListener("fullscreenchange", handleFsChange)
     return () => document.removeEventListener("fullscreenchange", handleFsChange)
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      const isTyping = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable
+      if (isTyping || e.metaKey || e.ctrlKey || e.altKey) return
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        handlePrev()
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault()
+        handleNext()
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
   }, [])
 
   let bookShift = 'translateX(0)'
@@ -102,10 +120,10 @@ export default function FlipbookViewer({ pages = [], title, month, year }: Flipb
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center overflow-hidden relative touch-none py-8 px-10 md:px-16">
+      <div className="flex-1 relative overflow-hidden flex flex-col items-center justify-center touch-none px-10 md:px-16 pt-1 pb-10">
 
         <div
-          className="relative w-full h-full flex flex-col items-center justify-center"
+          className="relative flex items-center justify-center w-full h-full"
           style={{ transform: `scale(${zoom})`, transformOrigin: 'center center', transition: 'transform 0.2s ease-out' }}
         >
 
@@ -116,13 +134,13 @@ export default function FlipbookViewer({ pages = [], title, month, year }: Flipb
             <div className={isCoverView ? "" : "shadow-2xl transition-shadow duration-500"}>
               {/* @ts-ignore */}
               <HTMLFlipBook
-                width={620}
-                height={876}
+                width={740}
+                height={1046}
                 size="stretch"
-                minWidth={450}
-                maxWidth={1150}
-                minHeight={636}
-                maxHeight={1600}
+                minWidth={480}
+                maxWidth={1350}
+                minHeight={679}
+                maxHeight={1912}
                 showCover={true}
                 usePortrait={false}
                 drawShadow={true}
@@ -166,13 +184,13 @@ export default function FlipbookViewer({ pages = [], title, month, year }: Flipb
               <Redo className="size-7" strokeWidth={1.5} />
             </button>
           )}
+        </div>
 
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden z-40">
-            <div
-              className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
-              style={{ width: `${totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0}%` }}
-            />
-          </div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden z-40">
+          <div
+            className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+            style={{ width: `${totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0}%` }}
+          />
         </div>
       </div>
     </div>
