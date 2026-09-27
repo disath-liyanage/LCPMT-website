@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Pencil, Trash2, X, Plus, Upload, FileText, ImageIcon, CheckCircle2 } from "lucide-react"
 import * as tus from 'tus-js-client'
 import { useRouter } from 'next/navigation'
+import { updateNewsletter } from '@/app/actions/newsletters'
 
 const BUCKET_NAME = 'pdfs'
 
@@ -30,6 +31,20 @@ export default function AdminNewslettersPage() {
   const coverInputRef = useRef<HTMLInputElement>(null)
   const pdfInputRef = useRef<HTMLInputElement>(null)
 
+  const [editingNewsletter, setEditingNewsletter] = useState<any | null>(null)
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false)
+  const [editName, setEditName] = useState("")
+  const [editYear, setEditYear] = useState(new Date().getFullYear().toString())
+  const [editMonth, setEditMonth] = useState((new Date().getMonth() + 1).toString())
+  const [editCoverImage, setEditCoverImage] = useState<File | null>(null)
+  const [editPdfFile, setEditPdfFile] = useState<File | null>(null)
+  const [editProgress, setEditProgress] = useState("")
+
+  const editCoverInputRef = useRef<HTMLInputElement>(null)
+  const editPdfInputRef = useRef<HTMLInputElement>(null)
+  const [isDraggingEditCover, setIsDraggingEditCover] = useState(false)
+  const [isDraggingEditPdf, setIsDraggingEditPdf] = useState(false)
+
   useEffect(() => {
     fetchNewsletters()
   }, [])
@@ -51,42 +66,224 @@ export default function AdminNewslettersPage() {
     }
   }
 
-  const handleEdit = (id: string) => {
-    alert("Edit functionality coming soon for newsletter: " + id)
+  const handleEdit = (newsletter: any) => {
+    setEditingNewsletter(newsletter)
+    setEditName(newsletter.name)
+    setEditYear(newsletter.year.toString())
+    setEditMonth(newsletter.month.toString())
+    setEditCoverImage(null)
+    setEditPdfFile(null)
+    setEditProgress("")
   }
 
-  const handleDragOver = (e: React.DragEvent, type: 'cover' | 'pdf') => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editName) {
+      alert("Please enter a name.")
+      return
+    }
+
+    setIsEditSubmitting(true)
+    setEditProgress("Initializing...")
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const updateData: any = {
+        name: editName,
+        year: parseInt(editYear),
+        month: parseInt(editMonth)
+      }
+
+      const getPathFromUrl = (url: string) => {
+        if (!url) return null;
+        const parts = url.split(`${BUCKET_NAME}/`);
+        return parts.length > 1 ? parts[1] : null;
+      }
+
+      if (editCoverImage) {
+        setEditProgress("Uploading new cover image...")
+        const folderName = `${Date.now()}_${editName.replace(/\s+/g, '-').toLowerCase()}`
+        const coverExt = editCoverImage.name.split('.').pop()
+        const coverPath = `covers/${folderName}.${coverExt}`
+        
+        const { error: coverError } = await supabase.storage
+          .from(BUCKET_NAME)
+          .upload(coverPath, editCoverImage)
+        if (coverError) throw coverError
+
+        const { data: { publicUrl: coverUrl } } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(coverPath)
+          
+        updateData.cover_image_url = coverUrl
+        
+        const oldCoverPath = getPathFromUrl(editingNewsletter.cover_image_url)
+        if (oldCoverPath) {
+          await supabase.storage.from(BUCKET_NAME).remove([oldCoverPath])
+        }
+      }
+
+      if (editPdfFile) {
+        setEditProgress("Uploading new PDF (this might take a while)...")
+        const folderName = `${Date.now()}_${editName.replace(/\s+/g, '-').toLowerCase()}`
+        const pdfPath = `documents/${folderName}.pdf`
+
+        await new Promise<void>((resolve, reject) => {
+          if (!session?.access_token) {
+            reject(new Error("You must be logged in to upload files."))
+            return
+          }
+
+          var upload = new tus.Upload(editPdfFile, {
+            endpoint: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/upload/resumable`,
+            retryDelays: [0, 3000, 5000, 10000, 20000],
+            headers: {
+              authorization: `Bearer ${session.access_token}`,
+              'x-upsert': 'true',
+            },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: BUCKET_NAME,
+              objectName: pdfPath,
+              contentType: 'application/pdf',
+              cacheControl: '3600',
+            },
+            chunkSize: 6 * 1024 * 1024,
+            onError: function (error) {
+              reject(error)
+            },
+            onProgress: function (bytesUploaded, bytesTotal) {
+              var percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+              setEditProgress(`Uploading PDF... ${percentage}%`)
+            },
+            onSuccess: function () {
+              resolve()
+            },
+          })
+          upload.start()
+        })
+
+        const { data: { publicUrl: pdfUrl } } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(pdfPath)
+          
+        updateData.pdf_url = pdfUrl
+
+        setEditProgress("Processing PDF pages (this may take a moment)...")
+        const pdfjsLib = await import('pdfjs-dist')
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
+
+        const arrayBuffer = await editPdfFile.arrayBuffer()
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+        const numPages = pdf.numPages
+        const imageUrls: string[] = []
+
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) throw new Error("Could not create canvas context")
+
+        for (let i = 1; i <= numPages; i++) {
+          setEditProgress(`Rendering page ${i} of ${numPages}...`)
+          const page = await pdf.getPage(i)
+          const viewport = page.getViewport({ scale: 1.5 })
+          canvas.height = viewport.height
+          canvas.width = viewport.width
+
+          // @ts-ignore
+          await page.render({ canvasContext: ctx, viewport }).promise
+
+          const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Canvas toBlob failed")), 'image/jpeg', 0.8)
+          })
+
+          const pagePath = `pages/${folderName}/page_${i}.jpg`
+          setEditProgress(`Uploading page ${i} of ${numPages}...`)
+          const { error: pageError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .upload(pagePath, blob)
+          if (pageError) throw pageError
+
+          const { data: { publicUrl: pageUrl } } = supabase.storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(pagePath)
+          imageUrls.push(pageUrl)
+        }
+        
+        updateData.page_images = imageUrls
+
+        const oldPdfPath = getPathFromUrl(editingNewsletter.pdf_url)
+        if (oldPdfPath) {
+          await supabase.storage.from(BUCKET_NAME).remove([oldPdfPath])
+        }
+        if (editingNewsletter.page_images && editingNewsletter.page_images.length > 0) {
+          const oldPagePaths = editingNewsletter.page_images
+            .map((url: string) => getPathFromUrl(url))
+            .filter(Boolean)
+          if (oldPagePaths.length > 0) {
+            await supabase.storage.from(BUCKET_NAME).remove(oldPagePaths)
+          }
+        }
+      }
+
+      setEditProgress("Saving newsletter details...")
+      const data = await updateNewsletter(editingNewsletter.id, updateData)
+
+      if (data && data.length > 0) {
+        setNewsletters(prev => prev.map(n => n.id === editingNewsletter.id ? data[0] : n))
+      }
+      setEditingNewsletter(null)
+      fetchNewsletters()
+    } catch (error: any) {
+      console.error("Error updating newsletter:", error)
+      alert(`Error: ${error.message}`)
+    } finally {
+      setIsEditSubmitting(false)
+      setEditProgress("")
+    }
+  }
+
+
+  const handleDragOver = (e: React.DragEvent, type: 'cover' | 'pdf' | 'edit-cover' | 'edit-pdf') => {
     e.preventDefault()
     if (type === 'cover') setIsDraggingCover(true)
-    else setIsDraggingPdf(true)
+    else if (type === 'pdf') setIsDraggingPdf(true)
+    else if (type === 'edit-cover') setIsDraggingEditCover(true)
+    else if (type === 'edit-pdf') setIsDraggingEditPdf(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent, type: 'cover' | 'pdf') => {
+  const handleDragLeave = (e: React.DragEvent, type: 'cover' | 'pdf' | 'edit-cover' | 'edit-pdf') => {
     e.preventDefault()
     if (type === 'cover') setIsDraggingCover(false)
-    else setIsDraggingPdf(false)
+    else if (type === 'pdf') setIsDraggingPdf(false)
+    else if (type === 'edit-cover') setIsDraggingEditCover(false)
+    else if (type === 'edit-pdf') setIsDraggingEditPdf(false)
   }
 
-  const handleDrop = (e: React.DragEvent, type: 'cover' | 'pdf') => {
+  const handleDrop = (e: React.DragEvent, type: 'cover' | 'pdf' | 'edit-cover' | 'edit-pdf') => {
     e.preventDefault()
     if (type === 'cover') setIsDraggingCover(false)
-    else setIsDraggingPdf(false)
+    else if (type === 'pdf') setIsDraggingPdf(false)
+    else if (type === 'edit-cover') setIsDraggingEditCover(false)
+    else if (type === 'edit-pdf') setIsDraggingEditPdf(false)
 
     const file = e.dataTransfer.files?.[0]
     if (!file) return
 
-    if (type === 'cover') {
+    if (type === 'cover' || type === 'edit-cover') {
       if (!file.type.startsWith('image/')) {
         alert("Please drop an image file for the cover.")
         return
       }
-      setCoverImage(file)
+      if (type === 'cover') setCoverImage(file)
+      else setEditCoverImage(file)
     } else {
       if (file.type !== 'application/pdf') {
         alert("Please drop a PDF file.")
         return
       }
-      setPdfFile(file)
+      if (type === 'pdf') setPdfFile(file)
+      else setEditPdfFile(file)
     }
   }
 
@@ -264,7 +461,7 @@ export default function AdminNewslettersPage() {
                     type="button"
                     onClick={(e) => {
                       e.preventDefault()
-                      handleEdit(newsletter.id)
+                      handleEdit(newsletter)
                     }}
                     title="Edit"
                     className="h-8 w-8 rounded-full bg-white/95 backdrop-blur flex items-center justify-center hover:bg-white transition-colors"
@@ -496,6 +693,200 @@ export default function AdminNewslettersPage() {
           </div>
         </div>
       )}
+
+      {editingNewsletter && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-background rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-6 border-b border-border">
+              <h2 className="text-2xl font-bold">Edit Newsletter</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={() => !isEditSubmitting && setEditingNewsletter(null)}
+                disabled={isEditSubmitting}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="p-6 overflow-y-auto">
+              <form onSubmit={handleEditSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    className="w-full p-2.5 border border-border rounded-full px-4 bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+                    placeholder="e.g. Spring Edition 2026"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">Year</label>
+                    <select
+                      value={editYear}
+                      onChange={e => setEditYear(e.target.value)}
+                      className="w-full p-2.5 border border-border rounded-full px-4 bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+                    >
+                      {[...Array(10)].map((_, i) => {
+                        const y = new Date().getFullYear() - 5 + i
+                        return <option key={y} value={y}>{y}</option>
+                      })}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">Month</label>
+                    <select
+                      value={editMonth}
+                      onChange={e => setEditMonth(e.target.value)}
+                      className="w-full p-2.5 border border-border rounded-full px-4 bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+                    >
+                      {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                        <option key={m} value={m}>
+                          {new Date(0, m - 1).toLocaleString('default', { month: 'long' })}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">New Cover Image (Optional)</label>
+                  <input
+                    ref={editCoverInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setEditCoverImage(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <div
+                    onClick={() => editCoverInputRef.current?.click()}
+                    onDragOver={(e) => handleDragOver(e, 'edit-cover')}
+                    onDragLeave={(e) => handleDragLeave(e, 'edit-cover')}
+                    onDrop={(e) => handleDrop(e, 'edit-cover')}
+                    className={`relative rounded-2xl border-2 border-dashed p-5 cursor-pointer transition-colors ${
+                      isDraggingEditCover
+                        ? "border-primary bg-primary/5"
+                        : editCoverImage
+                        ? "border-primary/40 bg-primary/[0.03]"
+                        : "border-border hover:border-primary/40 hover:bg-muted/40"
+                    }`}
+                  >
+                    {editCoverImage ? (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={URL.createObjectURL(editCoverImage)}
+                          alt="Cover preview"
+                          className="h-14 w-14 rounded-lg object-cover shrink-0 border border-border"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate flex items-center gap-1.5">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />
+                            {editCoverImage.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{formatBytes(editCoverImage.size)} - click or drop to replace</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setEditCoverImage(null) }}
+                          className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center py-4 gap-2">
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm font-medium">
+                          <span className="text-primary">Click to upload</span> or drag and drop a new cover
+                        </p>
+                        <p className="text-xs text-muted-foreground">PNG or JPG. Leave empty to keep current.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">New PDF Document (Optional)</label>
+                  <input
+                    ref={editPdfInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    onChange={e => setEditPdfFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <div
+                    onClick={() => editPdfInputRef.current?.click()}
+                    onDragOver={(e) => handleDragOver(e, 'edit-pdf')}
+                    onDragLeave={(e) => handleDragLeave(e, 'edit-pdf')}
+                    onDrop={(e) => handleDrop(e, 'edit-pdf')}
+                    className={`relative rounded-2xl border-2 border-dashed p-5 cursor-pointer transition-colors ${
+                      isDraggingEditPdf
+                        ? "border-primary bg-primary/5"
+                        : editPdfFile
+                        ? "border-primary/40 bg-primary/[0.03]"
+                        : "border-border hover:border-primary/40 hover:bg-muted/40"
+                    }`}
+                  >
+                    {editPdfFile ? (
+                      <div className="flex items-center gap-3">
+                        <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <FileText className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate flex items-center gap-1.5">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />
+                            {editPdfFile.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{formatBytes(editPdfFile.size)} - click or drop to replace</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setEditPdfFile(null) }}
+                          className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center py-4 gap-2">
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          <Upload className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm font-medium">
+                          <span className="text-primary">Click to upload</span> or drag and drop a new PDF
+                        </p>
+                        <p className="text-xs text-muted-foreground">PDF only. Leave empty to keep current.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isEditSubmitting}
+                  className="w-full rounded-full gap-2"
+                >
+                  {isEditSubmitting ? 'Updating...' : 'Update Newsletter'}
+                </Button>
+                {editProgress && (
+                  <div className="mt-4 p-4 bg-muted text-center rounded-xl font-medium text-sm">
+                    {editProgress}
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
