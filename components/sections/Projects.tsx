@@ -13,14 +13,14 @@ export default async function FeaturedProjects() {
   }
 
   return (
-    <section className="bg-muted/30 py-24" id="projects">
+    <section className="bg-[#FBF7ED] py-24" id="projects">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end mb-12">
+        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end mb-12 border-b border-[#0F2A1D]/10 pb-8">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">
               Our Impact
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#0F2A1D]">
               Featured Projects
             </h2>
           </div>

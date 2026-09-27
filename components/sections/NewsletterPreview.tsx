@@ -32,15 +32,17 @@ export default async function NewsletterPreview() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {newsletters.map((newsletter) => (
             <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-4">
-              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
-                <img
-                  src={newsletter.cover_image_url}
-                  alt={`Cover for ${newsletter.name}`}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative">
+                <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
+                  <img
+                    src={newsletter.cover_image_url}
+                    alt={`Cover for ${newsletter.name}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
               <div className="text-center">
                 <h3 className="font-serif text-xl font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#C9A24B] underline-offset-4">
@@ -59,9 +61,9 @@ export default async function NewsletterPreview() {
             <OriginButton className="group flex items-center gap-2">
               <span>View All Issues</span>
               <HugeiconsIcon
-                icon={ArrowRight01Icon} 
-                size={18} 
-                className="transition-transform duration-300 group-hover:translate-x-1.5" 
+                icon={ArrowRight01Icon}
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1.5"
               />
             </OriginButton>
           </Link>
