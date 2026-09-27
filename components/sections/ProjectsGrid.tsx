@@ -24,11 +24,6 @@ const projectKey = (project: Project) => String(project.id || project.slug);
 const cardDomId = (project: Project) => `grid-card-${encodeURIComponent(projectKey(project))}`;
 const projectLayoutId = (project: Project) => `project-container-${projectKey(project)}`;
 
-/**
- * Full-screen lightbox for a project's photos.
- * Uses a separated motion wrapper for swipe and native inline styles for pan/zoom
- * to prevent conflicting states (fixing the "moving everywhere" bug).
- */
 function PhotoLightbox({
   images,
   index,
