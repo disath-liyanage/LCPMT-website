@@ -139,6 +139,7 @@ export default function AdminNewslettersPage() {
         canvas.height = viewport.height
         canvas.width = viewport.width
 
+        // @ts-ignore
         await page.render({ canvasContext: ctx, viewport }).promise
 
         const blob = await new Promise<Blob>((resolve, reject) => {
