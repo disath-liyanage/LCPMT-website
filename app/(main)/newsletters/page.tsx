@@ -9,16 +9,16 @@ export default async function NewslettersPage({
 }) {
   const resolvedSearchParams = await searchParams
   const supabase = await createClient()
-  
+
   let query = supabase.from('newsletters').select('*').order('created_at', { ascending: false })
-  
+
   if (resolvedSearchParams?.year) {
     query = query.eq('year', parseInt(resolvedSearchParams.year))
   }
   if (resolvedSearchParams?.month) {
     query = query.eq('month', parseInt(resolvedSearchParams.month))
   }
-  
+
   const { data: newsletters, error } = await query
 
   if (error) {
@@ -28,121 +28,136 @@ export default async function NewslettersPage({
 
   const { data: allNewsletters } = await supabase.from('newsletters').select('year, month')
   const years = Array.from(new Set(allNewsletters?.map(n => n.year) || [])).sort((a, b) => b - a)
-  
+
+  const latest = newsletters?.[0]
+  const rest = newsletters?.slice(1) ?? []
+
   return (
-    <>
-      <style>{`
-        @keyframes animatedgradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-border {
-          animation: animatedgradient 3s ease alternate infinite;
-        }
-        .mask-hollow-border {
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-        }
-      `}</style>
+    <div className="min-h-screen bg-[#FBF7ED]">
 
-      <div className="max-w-7xl mx-auto px-4 pt-32 pb-16 sm:px-6 lg:px-8">
+      <div className="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8 border-b-4 border-[#C9A24B] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2560&auto=format&fit=crop"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#0F2A1D]/30" />
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#0F2A1D]/90 to-transparent" />
 
-        <div className="relative w-full aspect-[21/9] md:aspect-[4/1] rounded-3xl overflow-hidden mb-16 shadow-xl">
-          <img 
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2560&auto=format&fit=crop" 
-            alt="The Panorama Newsletter Banner" 
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center px-6">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-4 font-serif drop-shadow-md">
-              The Panorama Newsletter
-            </h1>
-            <p className="max-w-3xl text-sm md:text-lg text-white/90 font-medium leading-relaxed drop-shadow">
-              Explore stories of creativity, leadership, and service - projects driven by passion, teamwork, and a shared mission to create lasting change in our community.
-            </p>
-          </div>
+        <div className="relative max-w-7xl mx-auto">
+          <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-6 text-[#FBF7ED] drop-shadow-sm">
+            The Panorama
+          </h1>
+          <p className="max-w-2xl text-[#FBF7ED]/90 text-base md:text-lg leading-relaxed drop-shadow-sm">
+            Stories of creativity, leadership, and service - projects driven by passion, teamwork,
+            and a shared mission to create lasting change in our community.
+          </p>
         </div>
+      </div>
 
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold tracking-tight mb-10 text-center">Meet Our Editorial Team</h2>
-          <div className="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        {latest && (
+          <div className="mb-20">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-6">
+              Latest Issue
+            </p>
+            <Link
+              href={`/newsletters/${latest.id}`}
+              className="group grid md:grid-cols-[280px_1fr] gap-8 md:gap-12 items-center"
+            >
+              <div className="aspect-[3/4] relative overflow-hidden border-2 border-[#0F2A1D]/10 shadow-sm group-hover:border-[#0F2A1D]/30 transition-colors">
+                <img
+                  src={latest.cover_image_url}
+                  alt={`Cover for ${latest.name}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <p className="text-[#2F5D46] font-bold text-sm uppercase tracking-wider mb-3">
+                  {new Date(0, latest.month - 1).toLocaleString('default', { month: 'long' })} {latest.year}
+                </p>
+                <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0F2A1D] leading-tight mb-4 group-hover:underline decoration-[#C9A24B] decoration-2 underline-offset-4">
+                  {latest.name}
+                </h2>
+                <span className="inline-flex items-center gap-2 text-[#0F2A1D] font-semibold text-sm">
+                  Read the issue
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </span>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        <div className="mb-20 border-y border-[#0F2A1D]/10 py-12 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-8">
+            Meet our Editorial Team
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-8">
             {[
               { name: "Sarah Jenkins", role: "Chief Editor", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" },
               { name: "David Chen", role: "Co-Editor", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop" },
               { name: "Maya Patel", role: "Design Lead", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" }
             ].map((person, i) => (
-              <div 
-                key={i} 
-                className="group relative rounded-full hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl cursor-default"
-              >
-                <div 
-                  className="absolute -inset-[2px] p-[2px] rounded-full bg-[length:300%_300%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient-border mask-hollow-border pointer-events-none" 
-                  style={{ 
-                    backgroundImage: 'linear-gradient(60deg, #0F2A1D, #2F5D46, #6EB892, #A3D9B8, #4A8B6A, #173D2A, #0F2A1D)'
-                  }} 
-                />
-
-                <div className="relative flex items-center p-3 pr-10 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-2xl backdrop-saturate-200 border border-white/60 dark:border-white/20 transition-colors duration-300 w-full h-full text-foreground">
-                  <img 
-                    src={person.img} 
-                    alt={person.name} 
-                    className="size-20 md:size-24 rounded-full object-cover mr-5 ring-2 ring-primary/20 group-hover:ring-[#2F5D46] transition-all duration-300" 
+              <div key={i} className="flex flex-col items-center w-36 md:w-40">
+                <div className="w-full aspect-square overflow-hidden mb-3">
+                  <img
+                    src={person.img}
+                    alt={person.name}
+                    className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 hover:scale-105 transition-all duration-500"
                   />
-                  <div className="flex flex-col">
-                    <h3 className="font-bold text-lg md:text-xl leading-tight">{person.name}</h3>
-                    <p className="text-primary text-sm font-bold uppercase tracking-wider mt-1">{person.role}</p>
-                  </div>
                 </div>
+                <p className="font-serif font-bold text-[#0F2A1D] leading-tight">{person.name}</p>
+                <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mt-0.5">{person.role}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6 border-b pb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight">Past Issues</h2>
-            <p className="text-muted-foreground mt-2">Browse our previous releases.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-2">
+              Archive
+            </p>
+            <h2 className="font-serif text-3xl font-bold text-[#0F2A1D]">Past Issues</h2>
           </div>
-          
-          <NewsletterFilters 
-            years={years} 
-            currentYear={resolvedSearchParams?.year} 
-            currentMonth={resolvedSearchParams?.month} 
+
+          <NewsletterFilters
+            years={years}
+            currentYear={resolvedSearchParams?.year}
+            currentMonth={resolvedSearchParams?.month}
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {newsletters?.map((newsletter) => (
-            <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-4">
-              <div className="aspect-[3/4] relative overflow-hidden rounded-2xl border bg-muted/20 shadow-sm group-hover:shadow-xl transition-all duration-300">
-                <img 
-                  src={newsletter.cover_image_url} 
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-12">
+          {rest.map((newsletter) => (
+            <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-3">
+              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] transition-colors duration-200">
+                <img
+                  src={newsletter.cover_image_url}
                   alt={`Cover for ${newsletter.name}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none" />
               </div>
-              <div className="space-y-1 px-1 text-center">
-                <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors">
+              <div className="px-1 text-center">
+                <h3 className="font-serif font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#C9A24B] underline-offset-4">
                   {newsletter.name}
                 </h3>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mt-1">
                   {new Date(0, newsletter.month - 1).toLocaleString('default', { month: 'long' })} {newsletter.year}
                 </p>
               </div>
             </Link>
           ))}
-          
-          {newsletters?.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-24 text-center border-2 border-dashed rounded-2xl border-muted">
-              <p className="text-xl font-semibold text-foreground">No newsletters found.</p>
-              <p className="text-muted-foreground mt-2">Try adjusting your filters.</p>
+
+          {rest.length === 0 && !latest && (
+            <div className="col-span-full flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#0F2A1D]/20">
+              <p className="text-xl font-serif font-bold text-[#0F2A1D]">No newsletters found.</p>
+              <p className="text-[#2F5D46]/70 mt-2">Try adjusting your filters.</p>
             </div>
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }

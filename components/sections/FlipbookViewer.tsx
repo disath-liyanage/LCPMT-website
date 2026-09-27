@@ -82,7 +82,7 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full flex flex-col bg-background ${isFullscreen ? "fixed inset-0 z-[100]" : ""}`}
+      className={`w-full h-full flex flex-col bg-[#FBF7ED] ${isFullscreen ? "fixed inset-0 z-[100]" : ""}`}
     >
 
       <div className="flex flex-wrap items-center justify-between p-4 md:p-6 shrink-0 z-50 gap-4">
@@ -91,30 +91,30 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
             <Button
               variant="frosted-nav"
               size="icon"
-              className="rounded-full size-12 shadow-sm flex items-center justify-center [&_svg]:size-5"
+              className="rounded-full size-12 shadow-sm flex items-center justify-center [&_svg]:size-5 text-[#0F2A1D]"
             >
               <ChevronLeft strokeWidth={2} />
             </Button>
           </Link>
 
           <div className="flex flex-col">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+            <h1 className="font-serif text-xl md:text-2xl font-bold tracking-tight leading-tight text-[#0F2A1D]">
               {title}
             </h1>
-            <p className="text-sm font-medium text-muted-foreground tracking-wide">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#2F5D46]">
               {new Date(0, month - 1).toLocaleString('default', { month: 'long' })} {year}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="frosted-pill" size="icon" className="rounded-full" onClick={() => setZoom(z => Math.max(0.5, z - 0.2))}>
+          <Button variant="frosted-pill" size="icon" className="rounded-full text-[#0F2A1D]" onClick={() => setZoom(z => Math.max(0.5, z - 0.2))}>
             <ZoomOut className="size-5" />
           </Button>
-          <Button variant="frosted-pill" size="icon" className="rounded-full" onClick={() => setZoom(z => Math.min(3, z + 0.2))}>
+          <Button variant="frosted-pill" size="icon" className="rounded-full text-[#0F2A1D]" onClick={() => setZoom(z => Math.min(3, z + 0.2))}>
             <ZoomIn className="size-5" />
           </Button>
-          <Button variant="frosted-pill" size="icon" className="rounded-full" onClick={toggleFullScreen}>
+          <Button variant="frosted-pill" size="icon" className="rounded-full text-[#0F2A1D]" onClick={toggleFullScreen}>
             {isFullscreen ? <Minimize className="size-5" /> : <Maximize className="size-5" />}
           </Button>
         </div>
@@ -168,7 +168,7 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
               type="button"
               onClick={handlePrev}
               aria-label="Previous page"
-              className="absolute left-0 md:left-2 bottom-6 z-40 p-2 text-foreground/60 hover:text-foreground transition-colors"
+              className="absolute left-0 md:left-2 bottom-6 z-40 p-2 text-[#0F2A1D]/60 hover:text-[#0F2A1D] transition-colors"
             >
               <Undo className="size-7" strokeWidth={1.5} />
             </button>
@@ -179,16 +179,16 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
               type="button"
               onClick={handleNext}
               aria-label="Next page"
-              className="absolute right-0 md:right-2 bottom-6 z-40 p-2 text-foreground/60 hover:text-foreground transition-colors"
+              className="absolute right-0 md:right-2 bottom-6 z-40 p-2 text-[#0F2A1D]/60 hover:text-[#0F2A1D] transition-colors"
             >
               <Redo className="size-7" strokeWidth={1.5} />
             </button>
           )}
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden z-40">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-1.5 bg-[#0F2A1D]/10 rounded-full overflow-hidden z-40">
           <div
-            className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+            className="h-full bg-[#C9A24B] transition-all duration-300 ease-out rounded-full"
             style={{ width: `${totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0}%` }}
           />
         </div>
