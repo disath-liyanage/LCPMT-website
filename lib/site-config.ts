@@ -9,8 +9,7 @@ export const siteConfig = {
   district: "306 A2",
   sponsoringLionsClub: "Lions Club of Pannipitiya",
   email: "info@titanleos.org",
-  phone: "+94 77 000 0000",
-  whatsapp: "+94770000000",
+  phone: "+94 77 509 9624",
 
   social: {
     facebook: "https://www.facebook.com/titanleos.sl",
@@ -27,4 +26,11 @@ export const navLinks = [
   { href: "/#newsletters", label: "Newsletters" },
   { href: "/join", label: "Join Us" },
   { href: "/#contact", label: "Contact" },
+] as const;
+
+export const footLinks = [
+  { href: "/#hero", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  { href: "/newsletters", label: "Newsletters" },
+  { href: "/join", label: "Join Us" },
 ] as const;
