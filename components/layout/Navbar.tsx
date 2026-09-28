@@ -174,9 +174,13 @@ export default function Navbar() {
                     }
                   } else {
                     const basePath = link.href.split("#")[0] || "/";
-                    active =
-                      pathname === basePath ||
-                      (pathname.startsWith(`${basePath}/`) && basePath !== "/");
+
+                    if (basePath !== "/") {
+                      active = pathname === basePath || pathname.startsWith(`${basePath}/`);
+                    } else if (hashPart) {
+                      const routePath = `/${hashPart}`;
+                      active = pathname === routePath || pathname.startsWith(`${routePath}/`);
+                    }
                   }
 
                   if (!pastHero) {
