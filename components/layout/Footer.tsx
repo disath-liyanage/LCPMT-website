@@ -55,11 +55,11 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-4">
             <div className="flex items-center gap-4">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.svg"
                 alt="Leo Club Logo"
                 width={56}
                 height={56}
-                className="h-14 w-14 shrink-0 rounded-full object-cover shadow-lg"
+                className="h-14 w-14 shrink-0 rounded-full object-cover"
               />
               <span className="text-xl font-extrabold leading-tight tracking-tight">
                 Leo Club of <br /> Pannipitiya Metro Titans

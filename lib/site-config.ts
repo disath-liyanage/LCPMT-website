@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Leo Club of Pannipitiya Metro Titans",
-  shortName: "LC Pannipitiya Metro Titans",
+  shortName: "Pannipitiya Metro Titans",
   domain: "https://titanleos.org",
   tagline: "Leadership. Experience. Opportunity.",
   description:
-    "The Leo Club of Pannipitiya Metro Titans is a youth-led community service organisation in Pannipitiya, Sri Lanka, sponsored by Lions Clubs International. We run community, environment, health and youth-development projects across the area.",
+    "The Leo Club of Pannipitiya Metro Titans is a youth-led community service organisation, sponsored by Lions Clubs International. We run community, environment, health and youth-development projects across the area.",
   foundingYear: 2023,
   district: "306 A2",
   sponsoringLionsClub: "Lions Club of Pannipitiya",
