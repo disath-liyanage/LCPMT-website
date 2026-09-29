@@ -81,7 +81,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="grid h-11 w-11 place-items-center rounded-xl border border-[#F7F2E7]/15 bg-[#F7F2E7]/5 text-[#F7F2E7] transition-all duration-200 hover:-translate-y-1 hover:border-[#C8A45D] hover:bg-[#C8A45D] hover:text-[#0F2A1D] hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A45D]"
+                  className="grid h-11 w-11 place-items-center rounded-full border border-[#F7F2E7]/15 bg-[#F7F2E7]/5 text-[#F7F2E7] transition-all duration-200 hover:-translate-y-1 hover:border-[#C8A45D] hover:bg-[#C8A45D] hover:text-[#0F2A1D] hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A45D]"
                 >
                   <HugeiconsIcon icon={icon} size={20} />
                 </a>
@@ -118,7 +118,7 @@ export default function Footer() {
                   href={`mailto:${siteConfig.email}`}
                   className="group flex items-center gap-3 transition-colors hover:text-[#C8A45D] focus-visible:text-[#C8A45D] focus-visible:outline-none"
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#F7F2E7]/10 text-[#C8A45D] transition-all duration-200 group-hover:scale-105 group-hover:bg-[#C8A45D] group-hover:text-[#0F2A1D]">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#F7F2E7]/10 text-[#C8A45D] transition-all duration-200 group-hover:scale-105 group-hover:bg-[#C8A45D] group-hover:text-[#0F2A1D]">
                     <HugeiconsIcon icon={Mail02Icon} size={20} />
                   </span>
                   <span className="min-w-0 break-all">{siteConfig.email}</span>
@@ -129,7 +129,7 @@ export default function Footer() {
                   href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`}
                   className="group flex items-center gap-3 transition-colors hover:text-[#C8A45D] focus-visible:text-[#C8A45D] focus-visible:outline-none"
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#F7F2E7]/10 text-[#C8A45D] transition-all duration-200 group-hover:scale-105 group-hover:bg-[#C8A45D] group-hover:text-[#0F2A1D]">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#F7F2E7]/10 text-[#C8A45D] transition-all duration-200 group-hover:scale-105 group-hover:bg-[#C8A45D] group-hover:text-[#0F2A1D]">
                     <HugeiconsIcon icon={Call02Icon} size={20} />
                   </span>
                   <span>{siteConfig.phone}</span>
