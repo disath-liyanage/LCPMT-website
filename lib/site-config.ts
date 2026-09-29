@@ -32,6 +32,7 @@ export const navLinks = [
 
 export const footLinks = [
   { href: "/#hero", label: "Home" },
+  { href: "/about", label: "About" },
   { href: "/projects", label: "Projects" },
   { href: "/newsletters", label: "Newsletters" },
   { href: "/join", label: "Join Us" },

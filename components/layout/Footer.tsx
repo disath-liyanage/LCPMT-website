@@ -11,12 +11,16 @@ import {
   InstagramIcon,
   Linkedin01Icon,
   ArrowUpRight01Icon,
+  TiktokIcon,
+  YoutubeIcon
 } from "@hugeicons/core-free-icons";
 import { footLinks, siteConfig } from "@/lib/site-config";
 
 const socials = [
-  { label: "Facebook", href: siteConfig.social.facebook, icon: Facebook01Icon },
   { label: "Instagram", href: siteConfig.social.instagram, icon: InstagramIcon },
+  { label: "Facebook", href: siteConfig.social.facebook, icon: Facebook01Icon },
+  { label: "TikTok", href: siteConfig.social.tiktok, icon: TiktokIcon },
+  { label: "YouTube", href: siteConfig.social.youtube, icon: YoutubeIcon },
   { label: "LinkedIn", href: siteConfig.social.linkedin, icon: Linkedin01Icon },
 ];
 
