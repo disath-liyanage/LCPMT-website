@@ -95,9 +95,9 @@ export default async function NewslettersPage({
           </p>
           <div className="flex flex-wrap justify-center gap-x-12 md:gap-x-16 gap-y-14">
             {[
-              { name: "Leo Sinadi Badullage", role: "Secretary", img: "/images/team/sinadi.png" },
-              { name: "Leo Thulya Hasindi", role: "Assistant Secretary", img: "/images/team/thulya.png" },
-              { name: "Leo Rashida Jamaldeen", role: "Bulletin Editor", img: "/images/team/rashida.png" },
+              { name: "Leo Sinadi Sithumya", role: "Secretary", img: "/images/team/sinadi.png" },
+              { name: "Leo F. R. Jamaldeen", role: "Bulletin Editor", img: "/images/team/rashida.png" },
+              { name: "Leo Thulya Hasindi", role: "Asst. Secretary", img: "/images/team/thulya.png" },
               { name: "Leo Chesmi Maleena", role: "Digital Transformation", img: "/images/team/chesmi.png" }
             ].map((person, i) => (
               <div key={i} className="flex flex-col items-center w-44 sm:w-48 md:w-52">

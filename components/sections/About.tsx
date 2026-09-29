@@ -23,7 +23,7 @@ export default function AboutPreview() {
           </div>
           <div className="group absolute bottom-0 right-0 aspect-square w-[55%] overflow-hidden rounded-[2.5rem] border-8 border-[#FBFBF8] bg-[#16241B]/5 shadow-2xl shadow-[#16241B]/10">
               <Image
-                src="/images/about/about-small.jpeg"
+                src="/images/about/about-large.jpeg"
                 alt={photoA.alt || "Club highlight"}
                 fill
                 sizes="(min-width: 1024px) 20vw, 50vw"
