@@ -12,28 +12,24 @@ const NAV_HEIGHT = 64;
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [pastHero, setPastHero] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
 
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navContainerRef = useRef<HTMLDivElement>(null);
 
+  const isHomePage = pathname === "/";
+  const showNavBg = !isHomePage || isScrolled;
+
   useEffect(() => {
-    const hero = document.getElementById("hero");
+    const handleScrollBg = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
 
-    if (!hero) {
-      setPastHero(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setPastHero(!entry.isIntersecting),
-      { rootMargin: "-80% 0px 0px 0px" }
-    );
-
-    observer.observe(hero);
-    return () => observer.disconnect();
-  }, [pathname]);
+    handleScrollBg();
+    window.addEventListener("scroll", handleScrollBg, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollBg);
+  }, []);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -66,7 +62,7 @@ export default function Navbar() {
 
       const activeLink = navContainerRef.current.querySelector('[data-active="true"]') as HTMLElement;
 
-      if (activeLink && pastHero) {
+      if (activeLink && showNavBg) {
         setIndicatorStyle({
           left: activeLink.offsetLeft,
           width: activeLink.offsetWidth,
@@ -86,7 +82,7 @@ export default function Navbar() {
       clearTimeout(timer);
       window.removeEventListener("resize", updateIndicator);
     };
-  }, [activeSection, pathname, pastHero]);
+  }, [activeSection, pathname, showNavBg]);
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     const hashPart = href.includes("#") ? href.split("#")[1] : null;
@@ -116,9 +112,9 @@ export default function Navbar() {
           aria-label="Primary"
           className={cn(
             "relative h-16 w-full transition-all duration-300",
-            pastHero
+            showNavBg
               ? cn(
-                  "bg-[#F5F0E8]/55 backdrop-blur-2xl backdrop-saturate-[180%]",
+                  "bg-[#F5F0E8]/55 backdrop-blur-2xl backdrop-saturate-[180%] backdrop-brightness-125",
                   "shadow-[0_4px_24px_rgba(0,0,0,0.10)]"
                 )
               : "bg-transparent backdrop-blur-0 shadow-none"
@@ -143,8 +139,8 @@ export default function Navbar() {
                 />
               </div>
               <span className="hidden flex-col justify-center leading-tight whitespace-nowrap sm:flex">
-                <span className="text-sm font-bold text-[#2D3F2B]">Leo Club of</span>
-                <span className="text-sm font-bold tracking-wide text-[#2D3F2B]">
+                <span className="text-sm font-bold text-[#2D3F2B] antialiased">Leo Club of</span>
+                <span className="text-sm font-bold tracking-wide text-[#2D3F2B] antialiased">
                   Pannipitiya Metro Titans
                 </span>
               </span>
@@ -161,7 +157,7 @@ export default function Navbar() {
 
               {navLinks
                 .filter((link) => link.label.toLowerCase() !== "join us")
-                .filter((link) => !(!pastHero && link.label.toLowerCase() === "home"))
+                .filter((link) => !(!showNavBg && link.label.toLowerCase() === "home"))
                 .map((link) => {
                   const hashPart = link.href.includes("#") ? link.href.split("#")[1] : null;
                   const targetId = hashPart || link.href.replace(/^\/+/, "");
@@ -183,7 +179,7 @@ export default function Navbar() {
                     }
                   }
 
-                  if (!pastHero) {
+                  if (!showNavBg) {
                     active = false;
                   }
 
@@ -196,7 +192,7 @@ export default function Navbar() {
                       data-target={targetId}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "relative whitespace-nowrap px-1 py-1 text-[13px] sm:text-[14px] transition-colors duration-300",
+                        "relative whitespace-nowrap px-1 py-1 text-[13px] sm:text-[14px] transition-colors duration-300 antialiased",
                         active
                           ? "text-[#2D3F2B] font-bold"
                           : "text-[#556B52] font-semibold hover:text-[#1C2B1E] hover:font-bold"
@@ -208,12 +204,12 @@ export default function Navbar() {
                 })}
             </div>
 
-            <div className="shrink-0 z-10 flex items-center">
+            <div className="shrink-0 z-10 flex items-center pl-2">
               <Link href="/join" className="block">
                 <ShinyButton
                   className={cn(
                     "h-8 px-4 sm:h-9 sm:px-5 !text-[13px] sm:!text-[14px] !font-bold tracking-wide",
-                    !pastHero && "pause-shiny"
+                    !showNavBg && "pause-shiny"
                   )}
                 >
                   Join Us
