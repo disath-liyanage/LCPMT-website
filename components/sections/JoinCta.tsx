@@ -16,7 +16,7 @@ export default function JoinCta() {
             </span>
           </h2>
           <p className="mx-auto max-w-xl text-base sm:text-lg text-[#556B52] leading-relaxed font-medium">
-            We need doers aged 18-30 from Pannipitiya and beyond. Zero experience required - just the guts to step up and serve your community.
+            We need doers aged 18-30. <b>Zero experience required </b><br/>just the guts to step up and serve your community.
           </p>
         </div>
 
