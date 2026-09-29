@@ -37,7 +37,7 @@ export default function AboutPreview() {
             Young people serving their community.
           </h2>
 
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#5F6F65] sm:text-xl">
+         <p className="mt-6 max-w-xl text-xl font-semibold leading-relaxed text-[#07120D] sm:text-xl">
             The Leo Club of Pannipitiya Metro Titans is a youth service
             organization under Leo District 306 D7, bringing together young
             people with a shared passion for service, leadership and fellowship.
