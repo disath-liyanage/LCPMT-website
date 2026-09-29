@@ -16,6 +16,8 @@ export const siteConfig = {
     instagram: "https://www.instagram.com/titan_leos",
     whatsappChannel: "https://whatsapp.com/channel/0029VbD91YFDJ6Gw22rDTW0j",
     linkedin: "https://www.linkedin.com/in/titanleos/",
+    tiktok: "https://www.tiktok.com/@titan.leos",
+    youtube: "https://www.youtube.com/channel/UCNXIacOi3_8EWYP-p2kfAeg",
   },
 } as const;
 

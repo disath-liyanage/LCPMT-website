@@ -1,88 +1,82 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import styles from "./About.module.css";
-
-const PARAGRAPHS = [
-  "The Leo Club of Pannipitiya Metro Titans is a youth service organization under Leo District 306 D7, bringing together young people with a shared passion for service, leadership and fellowship.",
-  "Through community-focused projects, collaborations and member-driven initiatives, we aim to address meaningful needs while creating opportunities for our members to learn, lead, connect and grow.",
-  "Since our founding in 2006, the club has continued to evolve while staying committed to making a positive and lasting difference."
-];
-
-const PARAGRAPH_WORDS = PARAGRAPHS.map(p => p.split(" "));
-const TOTAL_WORDS = PARAGRAPH_WORDS.reduce((acc, words) => acc + words.length, 0);
+import Image from "next/image";
+import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { ABOUT_IMAGES, LEO_MEANING } from "@/lib/about-data";
 
 export default function AboutPreview() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    let frame: number | null = null;
-
-    const measure = () => {
-      const el = wrapperRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const scrollable = rect.height - window.innerHeight;
-      const scrolled = -rect.top;
-      
-      const progress = scrollable > 0 ? Math.min(Math.max(scrolled / scrollable, 0), 1) : 0;
-      setActiveIndex(progress * TOTAL_WORDS);
-    };
-
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        measure();
-        frame = null;
-      });
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    measure();
-    
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  let globalWordIndex = 0;
+  const [photoA] = ABOUT_IMAGES;
 
   return (
-    <section id="about" className={styles.about} ref={wrapperRef}>
-      <div className={styles.sticky}>
-        <div 
-          className={styles.textContainer} 
-          style={{ 
-            maxWidth: "1000px", 
-            margin: "0 auto", 
-            padding: "0 20px",
-            fontSize: "clamp(1.5rem, 4vw, 3rem)",
-            lineHeight: "1.3",
-            textAlign: "center",
-            fontWeight: "500"
-          }}
-        >
-          {PARAGRAPH_WORDS.map((words, pIndex) => (
-            <p key={pIndex} className={styles.paragraph} style={{ marginBottom: "1.5rem" }}>
-              {words.map((word) => {
-                const currentIndex = globalWordIndex++;
-                const reveal = Math.min(Math.max(activeIndex - currentIndex, 0), 1);
-                
-                return (
-                  <span
-                    key={currentIndex}
-                    className={`${styles.word} ${reveal > 0.5 ? styles.wordActive : ""}`}
-                    style={{ opacity: 0.25 + reveal * 0.75 }}
-                    data-word={word}
-                  >
-                    {word}{" "}
-                  </span>
-                );
-              })}
-            </p>
-          ))}
+    <section id="about" className="scroll-mt-16 bg-[#FBFBF8] py-16 lg:py-24">
+      <div className="mx-auto grid max-w-[90rem] items-center gap-16 px-4 sm:px-6 lg:grid-cols-12 lg:gap-20 lg:px-8">
+        
+        <div className="relative pb-10 lg:col-span-6">
+          <div className="group relative aspect-[4/5] w-[80%] overflow-hidden rounded-[2.5rem] bg-[#16241B]/5">
+            <Image
+              src="/images/about-large.jpeg"
+              alt="Our club in action"
+              fill
+              sizes="(min-width: 1024px) 32vw, 80vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+          <div className="group absolute bottom-0 right-0 aspect-square w-[55%] overflow-hidden rounded-[2.5rem] border-8 border-[#FBFBF8] bg-[#16241B]/5 shadow-2xl shadow-[#16241B]/10">
+              <Image
+                src="/images/about/about-small.jpeg"
+                alt={photoA.alt || "Club highlight"}
+                fill
+                sizes="(min-width: 1024px) 20vw, 50vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+          </div>
+        </div>
+
+        <div className="lg:col-span-6">
+          <h2 className="text-4xl font-black leading-tight tracking-tight text-[#16241B] sm:text-5xl lg:text-6xl">
+            Young people serving their community.
+          </h2>
+
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#5F6F65] sm:text-xl">
+            The Leo Club of Pannipitiya Metro Titans is a youth service
+            organization under Leo District 306 D7, bringing together young
+            people with a shared passion for service, leadership and fellowship.
+            Since our founding in 2006, we have kept growing while staying
+            committed to making a positive and lasting difference.
+          </p>
+
+          <ul className="mt-10 grid max-w-lg grid-cols-3 divide-x divide-[#16241B]/10 overflow-hidden rounded-3xl border border-[#16241B]/10 bg-white shadow-sm">
+            {LEO_MEANING.map(({ letter, word }) => (
+              <li key={letter} className="group px-3 py-6 text-center transition-colors hover:bg-[#FBFBF8] sm:px-4">
+                <span className="block text-4xl font-black leading-none tracking-tight text-[#2F6B4A] transition-transform duration-300 group-hover:scale-110">
+                  {letter}
+                </span>
+                <span className="mt-3 block text-sm font-bold uppercase tracking-wider text-[#16241B]/60">
+                  {word}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <Link
+              href="/about"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#2F6B4A] px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-[#25573C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBFBF8]"
+            >
+              Learn more about us
+              <HugeiconsIcon
+                icon={ArrowUpRight01Icon}
+                size={20}
+                className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
+            <Link
+              href="/about#journey"
+              className="text-sm font-bold text-[#16241B] underline decoration-[#2F6B4A] decoration-2 underline-offset-8 transition-colors hover:text-[#2F6B4A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16241B]"
+            >
+              See our journey
+            </Link>
+          </div>
         </div>
       </div>
     </section>
