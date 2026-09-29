@@ -34,21 +34,21 @@ export default async function NewslettersPage({
 
   return (
     <div className="min-h-screen bg-[#FBF7ED]">
-
-      <div className="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8 border-b-4 border-[#C9A24B] overflow-hidden">
+      <div className="relative pt-40 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2560&auto=format&fit=crop"
-          alt=""
+          src="/images/newsletter/banner.png"
+          alt="Newsletter Banner"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-[#0F2A1D]/30" />
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#0F2A1D]/90 to-transparent" />
+        
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F2A1D]/90 via-[#0F2A1D]/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F2A1D]/50 to-transparent sm:hidden"></div>
 
         <div className="relative max-w-7xl mx-auto">
-          <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-6 text-[#FBF7ED] drop-shadow-sm">
+          <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-6 text-[#FBF7ED] drop-shadow-lg">
             The Panorama
           </h1>
-          <p className="max-w-2xl text-[#FBF7ED]/90 text-base md:text-lg leading-relaxed drop-shadow-sm">
+          <p className="max-w-2xl text-[#FBF7ED]/95 text-base md:text-lg leading-relaxed drop-shadow-md font-medium">
             Stories of creativity, leadership, and service - projects driven by passion, teamwork,
             and a shared mission to create lasting change in our community.
           </p>
@@ -89,26 +89,31 @@ export default async function NewslettersPage({
           </div>
         )}
 
-        <div className="mb-20 border-y border-[#0F2A1D]/10 py-12 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-8">
+        <div className="mb-24 border-y border-[#0F2A1D]/10 py-16 md:py-20 text-center px-4">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-12">
             Meet our Editorial Team
           </p>
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-8">
+          <div className="flex flex-wrap justify-center gap-x-12 md:gap-x-16 gap-y-14">
             {[
-              { name: "Sarah Jenkins", role: "Chief Editor", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" },
-              { name: "David Chen", role: "Co-Editor", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop" },
-              { name: "Maya Patel", role: "Design Lead", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" }
+              { name: "Leo Sinadi Badullage", role: "Secretary", img: "/images/team/sinadi.png" },
+              { name: "Leo Thulya Hasindi", role: "Assistant Secretary", img: "/images/team/thulya.png" },
+              { name: "Leo Rashida Jamaldeen", role: "Bulletin Editor", img: "/images/team/rashida.png" },
+              { name: "Leo Chesmi Maleena", role: "Digital Transformation", img: "/images/team/chesmi.png" }
             ].map((person, i) => (
-              <div key={i} className="flex flex-col items-center w-36 md:w-40">
-                <div className="w-full aspect-square overflow-hidden mb-3">
+              <div key={i} className="flex flex-col items-center w-44 sm:w-48 md:w-52">
+                <div className="w-full aspect-square rounded-full overflow-hidden mb-6 shadow-sm border border-[#0F2A1D]/5">
                   <img
                     src={person.img}
                     alt={person.name}
                     className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 hover:scale-105 transition-all duration-500"
                   />
                 </div>
-                <p className="font-serif font-bold text-[#0F2A1D] leading-tight">{person.name}</p>
-                <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mt-0.5">{person.role}</p>
+                <p className="font-serif font-bold text-[#0F2A1D] text-lg leading-tight text-center px-2">
+                  {person.name}
+                </p>
+                <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mt-2.5 text-center">
+                  {person.role}
+                </p>
               </div>
             ))}
           </div>
@@ -132,7 +137,7 @@ export default async function NewslettersPage({
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-12">
           {rest.map((newsletter) => (
             <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-3">
-              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] transition-colors duration-200">
+              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] transition-colors duration-200 shadow-sm">
                 <img
                   src={newsletter.cover_image_url}
                   alt={`Cover for ${newsletter.name}`}
@@ -151,7 +156,7 @@ export default async function NewslettersPage({
           ))}
 
           {rest.length === 0 && !latest && (
-            <div className="col-span-full flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#0F2A1D]/20">
+            <div className="col-span-full flex flex-col items-center justify-center py-24 text-center border border-dashed border-[#0F2A1D]/20 rounded-2xl bg-white/30">
               <p className="text-xl font-serif font-bold text-[#0F2A1D]">No newsletters found.</p>
               <p className="text-[#2F5D46]/70 mt-2">Try adjusting your filters.</p>
             </div>
