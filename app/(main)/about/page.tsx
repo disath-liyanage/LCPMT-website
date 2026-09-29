@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
-  ArrowUpRight01Icon, 
+  ArrowUpRight01Icon,
+  ArrowRight01Icon,
   Facebook01Icon, 
   InstagramIcon, 
   TiktokIcon, 
@@ -92,7 +93,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-                    {facts.length > 0 && (
+          {facts.length > 0 && (
             <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-[0.8fr_2fr_2fr] lg:mt-20">
               <div className="flex flex-col gap-5">
                 {[numFact, foundFact].map((fact) => {
@@ -130,7 +131,6 @@ export default function AboutPage() {
               ))}
             </div>
           )}
-
         </div>
       </section>
 
@@ -197,6 +197,77 @@ export default function AboutPage() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 lg:py-28">
+        <div className={wrap}>
+          <div className="mx-auto max-w-3xl flex flex-col items-center text-center">
+            <h3 className="relative mb-4 pb-4 text-sm font-bold uppercase tracking-widest text-[#2F6B4A]">
+              What we are part of
+              <span className="absolute bottom-0 left-1/2 h-1 w-8 -translate-x-1/2 bg-[#2F6B4A]"></span>
+            </h3>
+            <h2 className="text-3xl font-bold leading-tight tracking-tight text-[#16241B] sm:text-4xl">
+              One question, asked in Chicago in 1917
+            </h2>
+            <p className="mt-6 px-6 text-lg font-medium leading-relaxed text-[#3A4A40] sm:px-12">
+              Melvin Jones asked a business club what it would be if it looked beyond its own
+              members. The association that answered became Lions Clubs International. The Leo
+              programme grew out of it in 1957.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-10 max-w-5xl grid gap-6 md:grid-cols-2 text-center">
+            <a
+              href="https://www.leomd306.org/about-us/history/lions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex aspect-square flex-col items-center justify-between rounded-[2.5rem] bg-gradient-to-b from-[#0D4495] to-[#082F6A] p-10 transition-all duration-300 sm:p-12 md:p-16"
+            >
+              <div>
+                <h3 className="text-3xl font-bold text-white sm:text-4xl">Lions International</h3>
+                <p className="mt-4 text-base text-white/80">
+                  Since 1917. The largest service organization in the world.
+                </p>
+              </div>
+              <div className="relative my-auto h-36 w-36 transition-transform duration-500 group-hover:scale-110 sm:h-40 sm:w-40 md:h-48 md:w-48">
+                <Image
+                  src="/images/lion-logo.png"
+                  alt="Lions International Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-white/40 bg-transparent px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 group-hover:bg-white group-hover:text-[#082F6A]">
+                Read the history <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+              </div>
+            </a>
+
+            <a
+              href="https://www.leomd306.org/about-us/history/leos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex aspect-square flex-col items-center justify-between rounded-[2.5rem] bg-gradient-to-b from-[#F2F2F2] to-[#E8E8E8] p-10 transition-all duration-300 sm:p-12 md:p-16"
+            >
+              <div>
+                <h3 className="text-3xl font-bold text-[#111827] sm:text-4xl">Leo</h3>
+                <p className="mt-4 text-base text-[#4B5563]">
+                  Leadership. Experience. Opportunity. Since 1957.
+                </p>
+              </div>
+              <div className="relative my-auto h-36 w-36 transition-transform duration-500 group-hover:scale-110 sm:h-40 sm:w-40 md:h-48 md:w-48">
+                <Image
+                  src="/images/leo-logo.png"
+                  alt="Leo Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-[#111827]/10 bg-transparent px-6 py-2.5 text-sm font-bold text-[#111827] transition-all duration-300 group-hover:border-[#16241B] group-hover:bg-[#16241B] group-hover:text-white">
+                Read the story <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+              </div>
+            </a>
           </div>
         </div>
       </section>
