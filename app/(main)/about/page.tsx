@@ -180,21 +180,29 @@ export default function AboutPage() {
             </div>
           )}
 
-          <div className="relative mt-12 overflow-hidden rounded-[2.5rem] bg-[#E8F0EB] border border-[#2F6B4A]/10 p-10 lg:p-16">
-            <div className="absolute left-0 top-0 h-full w-2 bg-[#2F6B4A]" />
-            <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="group relative mt-12 overflow-hidden rounded-[2.5rem] bg-[#E8F0EB] border border-[#2F6B4A]/10 px-8 py-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#2F6B4A]/20 hover:shadow-xl hover:shadow-[#2F6B4A]/10 sm:px-10 lg:px-16 lg:py-10">
+            <div className="absolute left-0 top-0 h-full w-2 bg-[#2F6B4A] transition-all duration-300 group-hover:w-3 group-hover:bg-[#25573C]" />
+            <div className="relative z-10 flex flex-col gap-10 md:flex-row md:items-center md:justify-between">
               <div className="max-w-2xl">
-                <h3 className="text-sm font-bold tracking-widest text-[#2F6B4A] uppercase">
+                <h3 className="text-sm font-bold tracking-widest text-[#2F6B4A] uppercase transition-colors duration-300 group-hover:text-[#25573C]">
                   Our year theme
                 </h3>
                 <p className="mt-4 text-3xl font-bold leading-tight tracking-tight text-[#16241B] sm:text-4xl lg:text-5xl">
                   {CLUB.theme.title}
                 </p>
                 {filled(CLUB.theme.description) && (
-                  <p className="mt-4 text-lg leading-relaxed text-[#5F6F65]">
+                  <p className="mt-4 text-lg font-medium leading-relaxed text-[#3A4A40]">
                     {CLUB.theme.description}
                   </p>
                 )}
+              </div>
+              <div className="relative h-40 w-40 shrink-0 self-center transition-transform duration-700 group-hover:scale-110 md:h-56 md:w-56 lg:h-64 lg:w-64">
+                <Image
+                  src="/images/logo-bk.png"
+                  alt="Year Theme Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
           </div>
