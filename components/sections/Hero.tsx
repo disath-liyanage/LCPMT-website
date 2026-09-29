@@ -28,9 +28,9 @@ export default function Hero() {
               <span className="block text-[#2F5D46]">Service</span>
             </h1>
             
-            <p className="mt-8 text-xl leading-relaxed text-[#173D2A] sm:text-2xl">
-              We are the <span className="font-bold">Leo Club of Pannipitiya Metro Titans</span> 
-              <span className="mt-2 block">
+            <p className="mt-8 text-lg font-medium leading-relaxed text-[#0F2A1D] sm:text-xl">
+              We are the <span className="font-extrabold text-[#07120D]">Leo Club of Pannipitiya Metro Titans</span> 
+              <span className="mt-2 block opacity-95">
                 A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
               </span>
             </p>
