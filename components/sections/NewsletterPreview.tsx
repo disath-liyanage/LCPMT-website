@@ -58,7 +58,7 @@ export default async function NewsletterPreview() {
 
         <div className="mt-12 flex justify-center">
           <Link href="/newsletters">
-            <OriginButton className="group flex items-center gap-2">
+            <OriginButton className="group flex items-center gap-2" aria-label="View Issues">
               <span>View All Issues</span>
               <HugeiconsIcon
                 icon={ArrowRight01Icon}

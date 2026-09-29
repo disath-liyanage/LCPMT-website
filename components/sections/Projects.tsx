@@ -26,7 +26,7 @@ export default async function FeaturedProjects() {
           </div>
           
           <Link href="/projects">
-            <OriginButton className="group flex items-center gap-2">
+            <OriginButton className="group flex items-center gap-2" aria-label="View Projects">
               <span>View All Projects</span>
               <HugeiconsIcon 
                 icon={ArrowRight01Icon} 

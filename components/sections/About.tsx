@@ -14,7 +14,7 @@ export default function AboutPreview() {
         <div className="relative pb-10 lg:col-span-6">
           <div className="group relative aspect-[4/5] w-[80%] overflow-hidden rounded-[2.5rem] bg-[#16241B]/5">
             <Image
-              src="/images/about-large.jpeg"
+              src="/images/about/small1.jpeg"
               alt="Our club in action"
               fill
               sizes="(min-width: 1024px) 32vw, 80vw"

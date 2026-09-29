@@ -202,6 +202,7 @@ export default function AboutPage() {
                   alt="Year Theme Logo"
                   fill
                   className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                 />
               </div>
             </div>
@@ -245,6 +246,7 @@ export default function AboutPage() {
                   alt="Lions International Logo"
                   fill
                   className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-white/40 bg-transparent px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 group-hover:bg-white group-hover:text-[#082F6A]">
@@ -270,6 +272,7 @@ export default function AboutPage() {
                   alt="Leo Logo"
                   fill
                   className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-[#111827]/10 bg-transparent px-6 py-2.5 text-sm font-bold text-[#111827] transition-all duration-300 group-hover:border-[#16241B] group-hover:bg-[#16241B] group-hover:text-white">
