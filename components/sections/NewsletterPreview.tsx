@@ -18,7 +18,7 @@ export default async function NewsletterPreview() {
   }
 
   return (
-    <section id="newsletters" className="py-16 bg-[#FBF7ED]">
+    <section id="newsletters" className="py-16 bg-[#FEFDF9]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-2">

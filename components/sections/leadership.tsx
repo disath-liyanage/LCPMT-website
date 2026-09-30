@@ -36,7 +36,7 @@ export default function LeadershipPage() {
       <div className="bg-[#FEFDF9] py-20">
         <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center mb-12">
-            <div className="w-10 h-1 bg-[#C9A24B] rounded-full mb-6"></div>
+            <div className="w-10 h-1 bg-[#2F6B4A] rounded-full mb-6"></div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-4">
               Our Leadership
             </p>

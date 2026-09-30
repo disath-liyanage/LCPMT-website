@@ -188,7 +188,7 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-1.5 bg-[#0F2A1D]/10 rounded-full overflow-hidden z-40">
           <div
-            className="h-full bg-[#C9A24B] transition-all duration-300 ease-out rounded-full"
+            className="h-full bg-[#2F6B4A] transition-all duration-300 ease-out rounded-full"
             style={{ width: `${totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0}%` }}
           />
         </div>

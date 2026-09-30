@@ -132,7 +132,7 @@ export default function JoinPage() {
                   <div 
                     key={s} 
                     className={`h-2 flex-1 mx-1 rounded-full transition-colors duration-300 ${
-                      step >= s ? 'bg-[#2D3F2B]' : 'bg-gray-200/50 backdrop-blur-sm'
+                      step >= s ? 'bg-[#2F6B4A]' : 'bg-gray-200/50 backdrop-blur-sm'
                     }`} 
                   />
                 ))}
@@ -163,7 +163,7 @@ export default function JoinPage() {
                       onClick={() => setFormData(prev => ({ ...prev, member_type: 'new' }))}
                       className={`px-6 py-8 rounded-[2rem] border-2 text-center transition-all duration-200 flex flex-col justify-center items-center gap-1 ${
                         formData.member_type === 'new'
-                          ? 'border-[#2D3F2B] bg-[#2D3F2B]/5 shadow-md ring-4 ring-[#2D3F2B]/10'
+                          ? 'border-[#2D3F2B] bg-[#2F6B4A]/5 shadow-md ring-4 ring-[#2F6B4A]/10'
                           : 'border-white/40 bg-white/30 hover:bg-white/50 hover:border-[#2D3F2B]/30'
                       }`}
                     >
@@ -408,7 +408,7 @@ export default function JoinPage() {
                 <Button 
                   type="submit" 
                   disabled={loading} 
-                  className="bg-[#2D3F2B] hover:bg-[#1C2B1E] text-white px-10 py-6 rounded-full font-semibold shadow-lg shadow-[#2D3F2B]/20 transition-all active:scale-95"
+                  className="bg-[#2F6B4A] hover:bg-[#25573C] text-white px-10 py-6 rounded-full font-semibold shadow-lg shadow-[#2D3F2B]/20 transition-all active:scale-95"
                 >
                   {step === 5 ? (loading ? "Submitting..." : "Submit Application") : "Next Section"}
                 </Button>

@@ -100,7 +100,7 @@ export default function FeaturedCarousel({ projects }: { projects: Project[] }) 
       <div className="w-24 sm:w-32 h-1.5 bg-secondary/50 rounded-full relative overflow-hidden mt-2 mx-auto">
         <div 
           ref={thumbRef}
-          className="absolute top-0 left-0 h-full bg-primary rounded-full transition-none"
+          className="absolute top-0 left-0 h-full bg-[#2F6B4A] rounded-full transition-none"
         />
       </div>
     </div>
