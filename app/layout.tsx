@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: "/images/placeholders/og-image.jpg",
+        url: "/images/Thumbnail.png",
         width: 1200,
         height: 630,
         alt: siteConfig.name,
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${siteConfig.name} | ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: ["/images/placeholders/og-image.jpg"],
+    images: ["/images/Thumbnail.png"],
   },
   alternates: {
     canonical: "/",
