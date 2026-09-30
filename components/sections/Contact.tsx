@@ -88,7 +88,7 @@ export default function Contact() {
                   href="tel:+94770000000" 
                   className="font-serif text-lg md:text-xl font-medium text-[#0F2A1D] hover:text-[#2F6B4A] transition-colors"
                 >
-                  +94 77 509 9624
+                  +94 70 582 1820
                 </a>
               </div>
             </div>

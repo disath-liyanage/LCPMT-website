@@ -9,7 +9,7 @@ export const siteConfig = {
   district: "306 A2",
   sponsoringLionsClub: "Lions Club of Pannipitiya",
   email: "info@titanleos.org",
-  phone: "+94 77 509 9624",
+  phone: "+94 70 582 1820",
 
   social: {
     facebook: "https://www.facebook.com/titanleos.sl",
