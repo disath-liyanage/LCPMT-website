@@ -21,7 +21,7 @@ const EmailPreviewShell = ({ markdownContent }: { markdownContent: string }) => 
   <div className="w-full max-w-[600px] mx-auto bg-white text-black rounded-lg overflow-hidden shadow-sm border border-gray-200">
     <div className="text-center pt-8 pb-4 bg-white">
       <img 
-        src="/images/email.png" 
+        src="/images/email.svg" 
         alt="Template Header" 
         className="max-w-[200px] h-auto inline-block" 
       />
