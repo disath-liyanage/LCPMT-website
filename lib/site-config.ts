@@ -2,12 +2,12 @@ export const siteConfig = {
   name: "Leo Club of Pannipitiya Metro Titans",
   shortName: "Pannipitiya Metro Titans",
   domain: "https://titanleos.org",
-  tagline: "Leadership. Experience. Opportunity.",
+  tagline: "Purpose Through Service",
   description:
-    "The Leo Club of Pannipitiya Metro Titans is a youth-led community service organisation, sponsored by Lions Clubs International. We run community, environment, health and youth-development projects across the area.",
-  foundingYear: 2023,
-  district: "306 A2",
-  sponsoringLionsClub: "Lions Club of Pannipitiya",
+    "The Leo Club of Pannipitiya Metro Titans is a community based, youth-led club, creating impact through service.",
+  foundingYear: 2006,
+  district: "306 D7",
+  sponsoringLionsClub: "Lions Club of Pannipitiya Metro",
   email: "info@titanleos.org",
   phone: "+94 70 582 1820",
 

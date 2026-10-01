@@ -4,7 +4,10 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/site-config";
 
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,28 +27,38 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "Leo Club",
-    "Pannipitiya",
-    "Metro Titans",
-    "Lions Clubs International",
+    "Leo Club of Pannipitiya Metro Titans",
+    "Leo Club Pannipitiya",
+    "Pannipitiya Leo Club",
+    "Leo Club Colombo",
+    "Leo Clubs Sri Lanka",
+    "Leo Clubs Sri Lanka",
+    "youth volunteering Colombo",
     "youth volunteering Sri Lanka",
-    "community service Pannipitiya",
-    "Leoism",
-    "Homagama volunteering",
+    "community service Colombo",
+    "community service Sri Lanka",
+    "Leoism Sri Lanka",
+    "Lions Clubs International",
   ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   icons: {
     icon: [
-      { url: "/images/logo.svg", type: "image/svg+xml" }
+      {
+        url: "/images/logo.svg",
+        type: "image/svg+xml",
+      },
     ],
     apple: [
-      { url: "/images/logo.svg" } 
-    ]
+      {
+        url: "/images/logo.svg",
+      },
+    ],
   },
+
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_LK",
     url: siteConfig.domain,
     siteName: siteConfig.name,
     title: `${siteConfig.name} | ${siteConfig.tagline}`,
@@ -68,6 +81,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+
   robots: {
     index: true,
     follow: true,
@@ -76,6 +90,7 @@ export const metadata: Metadata = {
       follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
 };
@@ -83,20 +98,35 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "NGO",
+
   name: siteConfig.name,
   alternateName: siteConfig.shortName,
   url: siteConfig.domain,
-  logo: `${siteConfig.domain}/images/placeholders/og-image.jpg`,
+  logo: `${siteConfig.domain}/images/logo.svg`,
   description: siteConfig.description,
   foundingDate: String(siteConfig.foundingYear),
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Pannipitiya",
-    addressRegion: "Western Province",
-    addressCountry: "LK",
-  },
   email: siteConfig.email,
   telephone: siteConfig.phone,
+
+  areaServed: [
+    {
+      "@type": "City",
+      name: "Colombo",
+      containedInPlace: {
+        "@type": "Country",
+        name: "Sri Lanka",
+      },
+    },
+    {
+      "@type": "Place",
+      name: "Pannipitiya",
+      containedInPlace: {
+        "@type": "Country",
+        name: "Sri Lanka",
+      },
+    },
+  ],
+
   sameAs: [
     siteConfig.social.facebook,
     siteConfig.social.instagram,
@@ -128,8 +158,11 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd),
+          }}
         />
+
         {children}
       </body>
     </html>
