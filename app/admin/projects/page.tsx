@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import AdminProjectsGrid from './AdminProjectsGrid'
 import { getProjects } from '@/app/actions/projects'
 
@@ -23,12 +24,12 @@ export default async function AdminProjectsDashboard() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Project Dashboard
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Logged in as {user.email}
-          </p>
         </div>
         
-        <Link href="/admin/create" className={buttonVariants({ variant: "default" })}>
+        <Link 
+          href="/admin/create" 
+          className={cn(buttonVariants({ variant: "default" }), "bg-[#2F6B4A] hover:bg-[#25573C] text-white font-semibold")}
+        >
           Add New Project
         </Link>
       </div>

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { deleteProject, toggleFeatureProject } from "@/app/actions/projects";
+import ProjectCard from "@/components/ui/ProjectCard";
 import type { Project } from "@/lib/data";
 
 const categories = [
@@ -16,11 +17,6 @@ const categories = [
   "Sports & Recreation",
   "Membership Development",
 ];
-
-const stripMarkdown = (str: string) => {
-  if (!str) return "";
-  return str.replace(/[#_*~`]/g, "").replace(/\[(.*?)\]\(.*?\)/g, "$1").trim();
-};
 
 export default function AdminProjectsGrid({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState("All");
@@ -42,9 +38,19 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
 
   return (
     <div className="mt-8">
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap items-center justify-center gap-2.5 mb-10">
         {categories.map((category) => (
-          <button key={category} type="button" onClick={() => setActive(category)} className={cn("rounded-full border px-4 py-2 text-sm font-medium transition-colors", active === category ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground/70 hover:bg-accent")}>
+          <button
+            key={category}
+            type="button"
+            onClick={() => setActive(category)}
+            className={cn(
+              "rounded-full border px-4 py-1.5 text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm",
+              active === category
+                ? "bg-[#2F6B4A] text-white border-[#2F6B4A] hover:bg-[#25573C] hover:border-[#25573C]"
+                : "bg-background border-border/80 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            )}
+          >
             {category}
           </button>
         ))}
@@ -52,48 +58,56 @@ export default function AdminProjectsGrid({ projects }: { projects: Project[] })
 
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((project) => {
-            const displayImage = project.main_image || (project.images && project.images[0]) || "/placeholder.jpg";
-            const previewText = project.summary || stripMarkdown(project.description);
-
-            return (
-              <div key={project.id} className={cn("group relative flex flex-col h-full overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-lg", project.featured_on_main ? "border-primary ring-2 ring-primary ring-offset-2" : "border-border")}>
-                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-                <div className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col sm:flex-row gap-2">
-                  <Link href={`/admin/edit/${project.id}`} className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200")}>
-                    Edit
-                  </Link>
-                  <Button variant={project.featured_on_main ? "default" : "secondary"} size="sm" className={cn("h-8 px-4 font-bold shadow-md", !project.featured_on_main && "bg-white text-black hover:bg-gray-200")} onClick={async () => { await toggleFeatureProject(project.id, project.featured_on_main || false); }}>
-                    {project.featured_on_main ? "★ Featured" : "Add to Main"}
-                  </Button>
-                </div>
-
-                <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button variant="destructive" size="sm" className="h-8 px-4 font-bold shadow-xl border border-red-800 bg-red-600/50 hover:bg-red-600/90 backdrop-blur-md text-white transition-all" onClick={() => handleDelete(project.id)} disabled={isPending}>
-                    {isPending ? "..." : "Delete"}
-                  </Button>
-                </div>
-
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-                  <img src={displayImage} alt={`${project.title} photo`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  {project.featured_on_main && <span className="absolute bottom-3 left-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground z-10 shadow-md">★ Main Page</span>}
-                  {project.images && project.images.length > 1 && <span className="absolute right-3 bottom-3 rounded-md bg-background/80 backdrop-blur-sm px-2 py-1 text-xs font-medium text-foreground z-10">{project.images.length} Photos</span>}
-                </div>
-                
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-xl font-bold text-foreground">{project.title}</h3>
-                  <div className="mt-3 flex items-center gap-x-4 text-xs text-muted-foreground font-medium">
-                    <span className="bg-muted/50 px-2 py-1 rounded-md">{new Date(project.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
-                  </div>
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">{previewText}</p>
-                </div>
+          {filtered.map((project) => (
+            <div key={project.id} className="group relative h-full rounded-2xl overflow-hidden">
+              <div className="h-full w-full [&_.absolute.top-3.left-3]:group-hover:opacity-0 [&_.absolute.top-4.left-4]:group-hover:opacity-0 [&_.absolute.top-3.left-3]:transition-opacity [&_.absolute.top-4.left-4]:transition-opacity">
+                <ProjectCard project={project} />
               </div>
-            );
-          })}
+              <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-t-2xl" />
+
+              <div className="absolute top-4 left-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col xl:flex-row gap-2">
+                <Link 
+                  href={`/admin/edit/${project.id}`} 
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-8 px-4 font-bold shadow-md bg-white text-black hover:bg-gray-200")}
+                >
+                  Edit
+                </Link>
+                <Button 
+                  variant="secondary"
+                  size="sm" 
+                  className={cn("h-8 px-4 font-bold shadow-md", project.featured_on_main ? "bg-[#2F6B4A] hover:bg-[#25573C] text-white" : "bg-white text-black hover:bg-gray-200")} 
+                  onClick={async () => { await toggleFeatureProject(project.id, project.featured_on_main || false); }}
+                >
+                  {project.featured_on_main ? "★ Featured" : "Add to Main"}
+                </Button>
+              </div>
+
+              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  className="h-8 px-4 font-bold shadow-xl border border-red-800 bg-red-600/90 hover:bg-red-700 backdrop-blur-md text-white transition-all" 
+                  onClick={() => handleDelete(project.id)} 
+                  disabled={isPending}
+                >
+                  {isPending ? "..." : "Delete"}
+                </Button>
+              </div>
+
+              {project.featured_on_main && (
+                <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
+                  <span className="bg-[#2F6B4A] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md border border-[#2F6B4A]/50">
+                    ★ Main Page
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm"><p className="text-muted-foreground">No projects found.</p></div>
+        <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
+          <p className="text-muted-foreground">No projects found.</p>
+        </div>
       )}
     </div>
   );
