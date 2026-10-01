@@ -10,7 +10,12 @@ export default async function NewslettersPage({
   const resolvedSearchParams = await searchParams
   const supabase = await createClient()
 
-  let query = supabase.from('newsletters').select('*').order('created_at', { ascending: false })
+  let query = supabase
+    .from('newsletters')
+    .select('*')
+    .order('year', { ascending: false })
+    .order('month', { ascending: false })
+    .order('name', { ascending: true })
 
   if (resolvedSearchParams?.year) {
     query = query.eq('year', parseInt(resolvedSearchParams.year))
