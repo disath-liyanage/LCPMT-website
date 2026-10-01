@@ -30,7 +30,7 @@ export default function GalleryGrid({ projects }: { projects: any[] }) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button
-          variant={activeFilter === "all" ? "default" : "outline"}
+          variant={activeFilter === "all" ? "frosted-filter-active" : "frosted-filter"}
           onClick={() => setActiveFilter("all")}
           className="rounded-full"
         >
@@ -40,7 +40,7 @@ export default function GalleryGrid({ projects }: { projects: any[] }) {
         {projects.map((project) => (
           <Button
             key={project.id}
-            variant={activeFilter === project.id ? "default" : "outline"}
+            variant={activeFilter === project.id ? "frosted-filter-active" : "frosted-filter"}
             onClick={() => setActiveFilter(project.id)}
             className="rounded-full"
           >

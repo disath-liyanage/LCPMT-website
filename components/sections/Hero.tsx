@@ -23,15 +23,16 @@ export default function Hero() {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
           
           <div className="max-w-3xl">
-            <h1 className="text-[3.5rem] font-extrabold leading-[1.05] tracking-tight text-[#07120D] sm:text-6xl lg:text-[5rem] xl:text-[5.5rem]">
+            <h1 className="font-extrabold leading-[1.05] tracking-tight text-[#07120D] text-5xl sm:text-6xl lg:text-[3.25rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
               <span className="block whitespace-nowrap">Purpose Through</span>
               <span className="block text-[#2F5D46]">Service</span>
             </h1>
             
-            <p className="mt-8 text-xl leading-relaxed text-[#173D2A] sm:text-2xl">
-              We are the <span className="font-bold">Leo Club of Pannipitiya Metro Titans</span>  
-              <br className="mt-2 block" /> 
-              A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
+            <p className="mt-8 text-lg font-medium leading-relaxed text-[#0F2A1D] sm:text-xl">
+              We are the <span className="font-extrabold text-[#07120D]">Leo Club of Pannipitiya Metro Titans</span> 
+              <span className="mt-2 block opacity-95">
+                A group of young people coming together to turn good ideas into meaningful action. Through service, leadership, teamwork and new experiences, we work to create an impact both within our community and beyond.
+              </span>
             </p>
             
             <div className="mt-12 flex flex-wrap items-center gap-5">
@@ -56,7 +57,7 @@ export default function Hero() {
           <div className="flex w-full flex-col gap-5">
             <div className="relative w-full overflow-hidden rounded-3xl bg-[#E8D8B8] aspect-[4/3] lg:aspect-[16/11]">
               <Image
-                src="/images/hero-4.jpeg"
+                src="/images/about/group.jpeg"
                 alt="Leo Club community service project"
                 fill
                 priority
