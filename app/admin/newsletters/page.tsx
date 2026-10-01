@@ -55,14 +55,58 @@ export default function AdminNewslettersPage() {
     setLoading(false)
   }
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return
+  const handleDelete = async (id: any, name: string) => {
+    if (!confirm(`Are you sure you want to delete "${name}"? This will permanently delete the database record and all associated files.`)) return
 
-    const { error } = await supabase.from('newsletters').delete().eq('id', id)
-    if (error) {
-      alert("Error deleting: " + error.message)
-    } else {
-      setNewsletters(newsletters.filter(n => n.id !== id))
+    try {
+      const newsletter = newsletters.find(n => String(n.id) === String(id))
+
+      if (newsletter) {
+        const getPathFromUrl = (url: string) => {
+          if (!url) return null;
+          const parts = url.split(`${BUCKET_NAME}/`);
+          return parts.length > 1 ? parts[1] : null;
+        }
+
+        const pathsToRemove: string[] = []
+        
+        const coverPath = getPathFromUrl(newsletter.cover_image_url)
+        if (coverPath) pathsToRemove.push(coverPath)
+
+        const pdfPath = getPathFromUrl(newsletter.pdf_url)
+        if (pdfPath) pathsToRemove.push(pdfPath)
+
+        if (newsletter.page_images && Array.isArray(newsletter.page_images)) {
+          newsletter.page_images.forEach((url: string) => {
+            const pagePath = getPathFromUrl(url)
+            if (pagePath) pathsToRemove.push(pagePath)
+          })
+        }
+
+        if (pathsToRemove.length > 0) {
+          const { error: storageError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .remove(pathsToRemove)
+          
+          if (storageError) {
+            console.error("Storage deletion error:", storageError)
+          }
+        }
+      }
+
+      const { data, error: dbError } = await supabase.from('newsletters').delete().eq('id', id).select()
+      
+      if (dbError) throw dbError
+
+      if (!data || data.length === 0) {
+        throw new Error("Could not delete from database. Please make sure you have a DELETE policy enabled in Supabase RLS.")
+      }
+
+      setNewsletters(newsletters.filter(n => String(n.id) !== String(id)))
+      
+    } catch (error: any) {
+      console.error("Error deleting:", error)
+      alert("Error deleting newsletter: " + error.message)
     }
   }
 
@@ -242,7 +286,6 @@ export default function AdminNewslettersPage() {
       setEditProgress("")
     }
   }
-
 
   const handleDragOver = (e: React.DragEvent, type: 'cover' | 'pdf' | 'edit-cover' | 'edit-pdf') => {
     e.preventDefault()
@@ -439,9 +482,9 @@ export default function AdminNewslettersPage() {
     <div className="max-w-6xl mx-auto px-4 py-12 relative">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Manage Newsletters</h1>
-        <Button onClick={() => setIsDialogOpen(true)} variant="default" className="gap-2 rounded-full">
+        <Button onClick={() => setIsDialogOpen(true)} className="gap-2 rounded-full  bg-[#2F6B4A] hover:bg-[#25573C] shadow-sm hover:shadow-md transition-all">
           <Plus className="h-4 w-4" />
-          Upload New Newsletter
+          Upload Edition
         </Button>
       </div>
 
@@ -678,7 +721,7 @@ export default function AdminNewslettersPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-full gap-2"
+                  className="w-full rounded-full gap-2 shadow-sm hover:shadow-md transition-all bg-[#2F6B4A] hover:bg-[#25573C]"
                 >
                   {isSubmitting ? 'Uploading & Processing...' : 'Upload Newsletter'}
                 </Button>
@@ -771,10 +814,10 @@ export default function AdminNewslettersPage() {
                     onDrop={(e) => handleDrop(e, 'edit-cover')}
                     className={`relative rounded-2xl border-2 border-dashed p-5 cursor-pointer transition-colors ${
                       isDraggingEditCover
-                        ? "border-primary bg-primary/5"
+                        ? "border-[#2F6B4A] bg-[#2F6B4A]/5"
                         : editCoverImage
-                        ? "border-primary/40 bg-primary/[0.03]"
-                        : "border-border hover:border-primary/40 hover:bg-muted/40"
+                        ? "border-[#2F6B4A]/40 bg-[#2F6B4A]/[0.03]"
+                        : "border-border hover:border-[#25573C] hover:bg-muted/40"
                     }`}
                   >
                     {editCoverImage ? (
@@ -872,7 +915,7 @@ export default function AdminNewslettersPage() {
                 <Button
                   type="submit"
                   disabled={isEditSubmitting}
-                  className="w-full rounded-full gap-2"
+                  className="w-full rounded-full gap-2 shadow-sm hover:shadow-md transition-all"
                 >
                   {isEditSubmitting ? 'Updating...' : 'Update Newsletter'}
                 </Button>
@@ -886,7 +929,6 @@ export default function AdminNewslettersPage() {
           </div>
         </div>
       )}
-
     </div>
   )
 }
