@@ -82,7 +82,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: "Best Fundraising Project",
     detail: "1st Runner-Up - Saruwath Corner",
     organisation: "Leo District 306 D7 - INVICTUS District Conference",
-    image:"/images/achievements/saruwath-corner.jpg",
+    image:"/images/achievements/saruwath.jpg",
   },
   {
     year: "2025/26",
