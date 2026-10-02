@@ -23,8 +23,8 @@ export default function Hero() {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
           
           <div className="max-w-3xl">
-            <h1 className="font-extrabold leading-[1.05] tracking-tight text-[#07120D] text-5xl sm:text-6xl lg:text-[3.25rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
-              <span className="block whitespace-nowrap">Purpose Through</span>
+            <h1 className="font-extrabold leading-[1.05] tracking-tight text-[#07120D] text-[2rem] min-[400px]:text-4xl sm:text-6xl lg:text-[3.25rem] xl:text-[4.5rem] 2xl:text-[5.5rem]">
+              <span className="block">Purpose Through</span>
               <span className="block text-[#2F5D46]">Service</span>
             </h1>
             
