@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SplashScreen from "@/components/layout/SplashScreen";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function MainLayout({
   children
@@ -28,6 +29,7 @@ export default function MainLayout({
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
+      <Analytics />
     </div>
   );
 }
