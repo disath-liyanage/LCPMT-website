@@ -180,7 +180,7 @@ function PhotoLightbox({
         <button
           ref={closeButtonRef}
           onClick={onClose}
-          className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all hover:scale-110"
+          className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all hover:scale-110 active:scale-95"
         >
           <HugeiconsIcon icon={Cancel01Icon} size={22} />
         </button>
@@ -195,17 +195,18 @@ function PhotoLightbox({
           <button
             onClick={() => index > 0 && onNavigate(index - 1)}
             disabled={index === 0}
-            className={cn("absolute left-2 sm:left-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all", index === 0 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
+            className={cn("absolute left-2 sm:left-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/30 text-white rounded-full transition-all shadow-lg active:scale-110", index === 0 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={22} />
           </button>
         )}
 
         <motion.div
-          className="w-full h-full absolute inset-0 flex items-center justify-center"
+          className="w-full h-full absolute inset-0 touch-pan-y"
           drag={canSwipe ? "x" : false}
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.8}
+          dragElastic={0.4}
+          dragTransition={{ bounceStiffness: 400, bounceDamping: 40 }}
           onDragEnd={(_, { offset, velocity }) => {
             if (!canSwipe) return;
             const swipe = swipePower(offset.x, velocity.x);
@@ -216,35 +217,44 @@ function PhotoLightbox({
             }
           }}
         >
-          {brokenImages.has(index) ? (
-            <div className="flex flex-col items-center gap-2 text-white/40">
-              <HugeiconsIcon icon={ImageNotFound01Icon} size={40} />
-              <span className="text-sm">Image unavailable</span>
-            </div>
-          ) : (
-            <motion.img
-              key={index}
-              src={images[index]}
-              alt={`${projectTitle} photo ${index + 1}`}
-              onClick={handleTap}
-              onDoubleClick={toggleZoom}
-              onError={() => onImageError(index)}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={stopMousePan}
-              onMouseLeave={stopMousePan}
-              style={{ x: pos.x, y: pos.y, scale, touchAction: "none" }}
-              className={cn("max-w-full max-h-full object-contain px-2", scale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in")}
-              draggable={false}
-            />
-          )}
+          <motion.div
+            className="w-full h-full flex items-center"
+            animate={{ x: `-${index * 100}%` }}
+            transition={{ type: "spring", stiffness: 400, damping: 40 }}
+          >
+            {images.map((imgSrc, idx) => (
+              <div key={idx} className="w-full h-full shrink-0 flex items-center justify-center relative">
+                {brokenImages.has(idx) ? (
+                  <div className="flex flex-col items-center gap-2 text-white/40">
+                    <HugeiconsIcon icon={ImageNotFound01Icon} size={40} />
+                    <span className="text-sm">Image unavailable</span>
+                  </div>
+                ) : (
+                  <motion.img
+                    src={imgSrc}
+                    alt={`${projectTitle} photo ${idx + 1}`}
+                    onClick={idx === index ? handleTap : undefined}
+                    onDoubleClick={idx === index ? toggleZoom : undefined}
+                    onError={() => onImageError(idx)}
+                    onMouseDown={idx === index ? handleMouseDown : undefined}
+                    onMouseMove={idx === index ? handleMouseMove : undefined}
+                    onMouseUp={idx === index ? stopMousePan : undefined}
+                    onMouseLeave={idx === index ? stopMousePan : undefined}
+                    style={idx === index ? { x: pos.x, y: pos.y, scale, touchAction: "none" } : { touchAction: "none" }}
+                    className={cn("max-w-full max-h-full object-contain px-2", scale > 1 && idx === index ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in")}
+                    draggable={false}
+                  />
+                )}
+              </div>
+            ))}
+          </motion.div>
         </motion.div>
 
         {images.length > 1 && (
           <button
             onClick={() => index < images.length - 1 && onNavigate(index + 1)}
             disabled={index === images.length - 1}
-            className={cn("absolute right-2 sm:right-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all", index === images.length - 1 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
+            className={cn("absolute right-2 sm:right-6 z-50 p-2 sm:p-3 bg-white/10 hover:bg-white/30 text-white rounded-full transition-all shadow-lg active:scale-110", index === images.length - 1 ? "opacity-0 pointer-events-none" : "hover:scale-110")}
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={22} />
           </button>
@@ -265,7 +275,7 @@ function PhotoLightbox({
                 "relative h-12 w-12 sm:h-14 sm:w-14 rounded-lg overflow-hidden transition-all duration-300 shrink-0",
                 idx === index
                   ? "scale-110 ring-2 ring-white/80 shadow-lg opacity-100"
-                  : "opacity-50 hover:opacity-100"
+                  : "opacity-50 hover:opacity-100 active:scale-95"
               )}
             >
               {brokenImages.has(idx) ? (
@@ -301,6 +311,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [navFlash, setNavFlash] = useState<"left" | "right" | null>(null);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Set<number>>(new Set());
   const [sessionLayoutId, setSessionLayoutId] = useState<string | null>(null);
 
@@ -323,7 +334,6 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const initializedUrl = useRef(false);
   const [urlReady, setUrlReady] = useState(false);
   const closingRef = useRef(false);
-  const dragX = useMotionValue(0);
 
   useEffect(() => {
     if (initializedUrl.current) return;
@@ -360,24 +370,12 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const hasCollabs = !!activeProject && (!!activeProject.collaborators?.length || !!activeProject.collaborative_club);
 
   useEffect(() => {
-    if (!isOpen || !activeProject || lightboxOpen || isHoveringImage || carouselImages.length <= 1) return;
+    if (!isOpen || !activeProject || lightboxOpen || isHoveringImage || isDraggingImage || carouselImages.length <= 1) return;
     const intervalRef = setInterval(() => {
-      const x = dragX.get();
-      if (x === 0) {
-        setActiveImageIndex((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
-      }
+      setActiveImageIndex((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
     }, AUTOPLAY_MS);
     return () => clearInterval(intervalRef);
-  }, [isOpen, activeProject, lightboxOpen, isHoveringImage, dragX, carouselImages.length, activeImageIndex]);
-
-  const onDragEnd = () => {
-    const x = dragX.get();
-    if (x <= -50 && activeImageIndex < carouselImages.length - 1) {
-      setActiveImageIndex((prev) => prev + 1);
-    } else if (x >= 50 && activeImageIndex > 0) {
-      setActiveImageIndex((prev) => prev - 1);
-    }
-  };
+  }, [isOpen, activeProject, lightboxOpen, isHoveringImage, isDraggingImage, carouselImages.length]);
 
   const openProject = useCallback(
     (index: number) => {
@@ -491,7 +489,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
               disabled={modalPresent}
               onClick={() => setActive(category)}
               className={cn(
-                "rounded-full border px-5 py-2 text-sm font-semibold transition-colors duration-200 shadow-sm outline-none",
+                "rounded-full border px-5 py-2 text-sm font-semibold transition-colors duration-200 shadow-sm outline-none active:scale-95",
                 active === category
                   ? "bg-[#2F6B4A] text-white border-[#2F6B4A]"
                   : "bg-transparent border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/30 disabled:opacity-50"
@@ -543,10 +541,10 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9991] pointer-events-none flex items-center justify-between px-2 sm:px-8"
+              className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-between px-2 sm:px-8"
             >
               <Button
-                variant="frosted-nav"
+                variant="outline"
                 aria-label="Previous project"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -554,15 +552,16 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                 }}
                 disabled={selectedIndex === 0 || lightboxOpen}
                 className={cn(
-                  "flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg",
-                  selectedIndex === 0 || lightboxOpen ? "!opacity-0 pointer-events-none" : "hover:scale-110",
-                  navFlash === "left" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30"
+                  "flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7",
+                  "bg-white/90 dark:bg-black/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.08)] border-2 border-transparent text-foreground",
+                  selectedIndex === 0 || lightboxOpen ? "!opacity-0 pointer-events-none" : "hover:scale-110 active:scale-110 hover:bg-[#ebf7f1] hover:text-[#2F6B4A] hover:border-[#2F6B4A]/30 hover:shadow-[0_12px_40px_rgba(47,107,74,0.2)] dark:hover:bg-[#2F6B4A]/20 dark:hover:text-white dark:hover:border-[#2F6B4A]/40",
+                  navFlash === "left" && "scale-110 bg-[#ebf7f1] text-[#2F6B4A] border-[#2F6B4A]/30 shadow-[0_12px_40px_rgba(47,107,74,0.2)] dark:bg-[#2F6B4A]/20 dark:text-white dark:border-[#2F6B4A]/40"
                 )}
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} />
               </Button>
               <Button
-                variant="frosted-nav"
+                variant="outline"
                 aria-label="Next project"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -570,9 +569,10 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                 }}
                 disabled={selectedIndex === filtered.length - 1 || lightboxOpen}
                 className={cn(
-                  "flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7 shadow-lg",
-                  selectedIndex === filtered.length - 1 || lightboxOpen ? "!opacity-0 pointer-events-none" : "hover:scale-110",
-                  navFlash === "right" && "scale-110 bg-white/80 shadow-xl dark:bg-white/30"
+                  "flex pointer-events-auto transition-all duration-300 w-10 h-10 sm:w-14 sm:h-14 rounded-full items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-7",
+                  "bg-white/90 dark:bg-black/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.08)] border-2 border-transparent text-foreground",
+                  selectedIndex === filtered.length - 1 || lightboxOpen ? "!opacity-0 pointer-events-none" : "hover:scale-110 active:scale-110 hover:bg-[#ebf7f1] hover:text-[#2F6B4A] hover:border-[#2F6B4A]/30 hover:shadow-[0_12px_40px_rgba(47,107,74,0.2)] dark:hover:bg-[#2F6B4A]/20 dark:hover:text-white dark:hover:border-[#2F6B4A]/40",
+                  navFlash === "right" && "scale-110 bg-[#ebf7f1] text-[#2F6B4A] border-[#2F6B4A]/30 shadow-[0_12px_40px_rgba(47,107,74,0.2)] dark:bg-[#2F6B4A]/20 dark:text-white dark:border-[#2F6B4A]/40"
                 )}
               >
                 <HugeiconsIcon icon={ArrowRight01Icon} />
@@ -605,7 +605,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                   ref={closeButtonRef}
                   onClick={closeProject}
                   aria-label="Close project"
-                  className="absolute top-4 right-4 z-[9999] p-2 bg-black/50 hover:bg-black text-white border border-white/10 rounded-full backdrop-blur-md transition-all hover:scale-110 hover:rotate-90"
+                  className="absolute top-4 right-4 z-[9999] p-2 bg-black/50 hover:bg-black text-white border border-white/10 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 hover:rotate-90 shadow-md"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={24} />
                 </button>
@@ -624,18 +624,6 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                     exit="exit"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     className="absolute inset-0 flex flex-col md:flex-row bg-card"
-                    drag={!lightboxOpen ? "x" : false}
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={1}
-                    onDragEnd={(_, { offset, velocity }) => {
-                      if (lightboxOpen) return;
-                      const swipe = swipePower(offset.x, velocity.x);
-                      if (swipe < -swipeConfidenceThreshold && selectedIndex < filtered.length - 1) {
-                        goToProject(selectedIndex + 1);
-                      } else if (swipe > swipeConfidenceThreshold && selectedIndex > 0) {
-                        goToProject(selectedIndex - 1);
-                      }
-                    }}
                   >
                     <div
                       className="relative w-full md:w-1/2 h-[45%] md:h-full bg-muted/5 flex flex-col group overflow-hidden"
@@ -665,7 +653,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                             </span>
 
                             {carouselImages.length > 1 && (
-                              <span className="bg-white/10 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.3)] tabular-nums">
+                              <span className="bg-white/10 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.3)] tabular-nums mr-12 md:mr-0">
                                 {activeImageIndex + 1} / {carouselImages.length}
                               </span>
                             )}
@@ -673,49 +661,60 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
                           <div className="relative w-full flex-1 overflow-hidden flex items-center justify-center z-10 my-auto">
                             <motion.div
+                              className="w-full h-full absolute inset-0 touch-pan-y"
                               drag={!lightboxOpen ? "x" : false}
                               dragConstraints={{ left: 0, right: 0 }}
-                              style={{ x: !lightboxOpen ? dragX : 0 }}
-                              animate={{ translateX: `-${activeImageIndex * 100}%` }}
-                              transition={
-                                lightboxOpen
-                                  ? { duration: 0 }
-                                  : { type: "spring", mass: 3, stiffness: 400, damping: 50 }
-                              }
-                              onDragEnd={onDragEnd}
-                              className="flex w-full h-full items-center"
+                              dragElastic={0.4}
+                              dragTransition={{ bounceStiffness: 400, bounceDamping: 40 }}
+                              onDragStart={() => setIsDraggingImage(true)}
+                              onDragEnd={(_, { offset, velocity }) => {
+                                setIsDraggingImage(false);
+                                if (lightboxOpen) return;
+                                const swipe = swipePower(offset.x, velocity.x);
+                                if (swipe < -swipeConfidenceThreshold && activeImageIndex < carouselImages.length - 1) {
+                                  setActiveImageIndex((prev) => prev + 1);
+                                } else if (swipe > swipeConfidenceThreshold && activeImageIndex > 0) {
+                                  setActiveImageIndex((prev) => prev - 1);
+                                }
+                              }}
                             >
-                              {carouselImages.map((imgSrc, idx) => (
-                                <motion.div
-                                  key={idx}
-                                  animate={{
-                                    scale: activeImageIndex === idx ? 1 : 0.85,
-                                    opacity: activeImageIndex === idx ? 1 : 0.4,
-                                  }}
-                                  transition={{ type: "spring", mass: 3, stiffness: 400, damping: 50 }}
-                                  className="relative shrink-0 flex items-center justify-center cursor-pointer w-full h-full px-6 sm:px-10 md:px-12 py-2"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (activeImageIndex === idx) setLightboxOpen(true);
-                                    else setActiveImageIndex(idx);
-                                  }}
-                                >
-                                  {brokenImages.has(idx) ? (
-                                    <div className="w-full h-full bg-black/20 backdrop-blur-md rounded-[1.5rem] flex flex-col items-center justify-center gap-2 text-white/40 shadow-2xl">
-                                      <HugeiconsIcon icon={ImageNotFound01Icon} size={32} />
-                                      <span className="text-xs">Image unavailable</span>
-                                    </div>
-                                  ) : (
-                                    <img
-                                      src={imgSrc}
-                                      alt=""
-                                      loading={Math.abs(idx - activeImageIndex) <= 1 ? "eager" : "lazy"}
-                                      onError={() => setBrokenImages((prev) => new Set(prev).add(idx))}
-                                      className="w-full h-full object-cover rounded-[1.5rem] shadow-[0_16px_50px_-12px_rgba(0,0,0,0.7)] cursor-zoom-in transition-all duration-300 hover:shadow-[0_24px_60px_-10px_rgba(0,0,0,0.8)]"
-                                    />
-                                  )}
-                                </motion.div>
-                              ))}
+                              <motion.div
+                                className="w-full h-full flex items-center"
+                                animate={{ x: `-${activeImageIndex * 100}%` }}
+                                transition={{ type: "spring", stiffness: 400, damping: 40 }}
+                              >
+                                {carouselImages.map((imgSrc, idx) => (
+                                  <motion.div
+                                    key={idx}
+                                    animate={{
+                                      scale: activeImageIndex === idx ? 1 : 0.85,
+                                      opacity: activeImageIndex === idx ? 1 : 0.4,
+                                    }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 40 }}
+                                    className="relative shrink-0 flex items-center justify-center cursor-pointer w-full h-full px-6 sm:px-10 md:px-12 py-2"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (activeImageIndex === idx) setLightboxOpen(true);
+                                      else setActiveImageIndex(idx);
+                                    }}
+                                  >
+                                    {brokenImages.has(idx) ? (
+                                      <div className="w-full h-full bg-black/20 backdrop-blur-md rounded-[1.5rem] flex flex-col items-center justify-center gap-2 text-white/40 shadow-2xl">
+                                        <HugeiconsIcon icon={ImageNotFound01Icon} size={32} />
+                                        <span className="text-xs">Image unavailable</span>
+                                      </div>
+                                    ) : (
+                                      <img
+                                        src={imgSrc}
+                                        alt=""
+                                        loading={Math.abs(idx - activeImageIndex) <= 1 ? "eager" : "lazy"}
+                                        onError={() => setBrokenImages((prev) => new Set(prev).add(idx))}
+                                        className="w-full h-full object-cover rounded-[1.5rem] shadow-[0_16px_50px_-12px_rgba(0,0,0,0.7)] cursor-zoom-in transition-all duration-300 hover:shadow-[0_24px_60px_-10px_rgba(0,0,0,0.8)]"
+                                      />
+                                    )}
+                                  </motion.div>
+                                ))}
+                              </motion.div>
                             </motion.div>
                           </div>
 
@@ -731,7 +730,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                                       setActiveImageIndex(idx);
                                     }}
                                     className={cn(
-                                      "relative h-10 w-10 sm:h-12 sm:w-12 rounded-[14px] overflow-hidden transition-all duration-300 shrink-0 cursor-pointer shadow-md",
+                                      "relative h-10 w-10 sm:h-12 sm:w-12 rounded-[14px] overflow-hidden transition-all duration-300 shrink-0 cursor-pointer shadow-md active:scale-95",
                                       idx === activeImageIndex
                                         ? "scale-105 ring-2 ring-white/90 opacity-100 shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
                                         : "opacity-60 hover:opacity-100"
@@ -758,7 +757,10 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                     <div className="w-full md:w-1/2 h-[55%] md:h-full flex flex-col relative bg-card">
                       <div className="flex-1 overflow-y-auto p-6 md:p-10 pb-10">
                         <div className="flex flex-col gap-3 mb-6 pr-8">
-                          <div className="flex items-center">
+                          <div className={cn(
+                            "flex items-center transition-all duration-300",
+                            selectedIndex !== null && selectedIndex > 0 ? "pl-8 sm:pl-0" : ""
+                          )}>
                             <span className="bg-[#2F6B4A] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
                               {activeProject.category}
                             </span>
@@ -792,7 +794,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 bg-muted/40 text-foreground/90 px-3 py-1.5 rounded-full text-xs font-semibold border border-border/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md group"
+                              className="flex items-center gap-1.5 bg-muted/40 text-foreground/90 px-3 py-1.5 rounded-full text-xs font-semibold border border-border/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md group active:scale-95"
                             >
                               <HugeiconsIcon
                                 icon={Location01Icon}
@@ -824,7 +826,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       key={idx}
-                                      className="inline-flex items-center gap-1.5 bg-white border border-[#2F6B4A]/10 shadow-sm text-foreground/90 hover:text-[#2F6B4A] hover:border-[#2F6B4A]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 px-3 py-1.5 rounded-full text-xs font-semibold group"
+                                      className="inline-flex items-center gap-1.5 bg-white border border-[#2F6B4A]/10 shadow-sm text-foreground/90 hover:text-[#2F6B4A] hover:border-[#2F6B4A]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 px-3 py-1.5 rounded-full text-xs font-semibold group active:scale-95"
                                     >
                                       {collab.name}{" "}
                                       <HugeiconsIcon
@@ -848,7 +850,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
                                     href={activeProject.collaborative_club_link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 bg-white border border-[#2F6B4A]/10 shadow-sm text-foreground/90 hover:text-[#2F6B4A] hover:border-[#2F6B4A]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 px-3 py-1.5 rounded-full text-xs font-semibold group"
+                                    className="inline-flex items-center gap-1.5 bg-white border border-[#2F6B4A]/10 shadow-sm text-foreground/90 hover:text-[#2F6B4A] hover:border-[#2F6B4A]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 px-3 py-1.5 rounded-full text-xs font-semibold group active:scale-95"
                                   >
                                     {activeProject.collaborative_club}{" "}
                                     <HugeiconsIcon
