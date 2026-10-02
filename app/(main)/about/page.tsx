@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
   ArrowUpRight01Icon,
+  ArrowRight01Icon,
   Facebook01Icon, 
   InstagramIcon, 
   TiktokIcon, 
@@ -249,7 +250,7 @@ export default function AboutPage() {
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-white/40 bg-transparent px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 group-hover:bg-white group-hover:text-[#082F6A]">
-                Read the history <HugeiconsIcon icon={ArrowUpRight01Icon} size={18} />
+                Read the history <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
               </div>
             </a>
 
@@ -275,7 +276,7 @@ export default function AboutPage() {
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-[#111827]/10 bg-transparent px-6 py-2.5 text-sm font-bold text-[#111827] transition-all duration-300 group-hover:border-[#16241B] group-hover:bg-[#16241B] group-hover:text-white">
-                Read the story <HugeiconsIcon icon={ArrowUpRight01Icon} size={18} />
+                Read the story <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
               </div>
             </a>
           </div>
