@@ -49,7 +49,7 @@ export default async function NewsletterPreview() {
           {newsletters.map((newsletter) => (
             <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-4">
               <div className="relative">
-                <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
+                <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#2F5D46] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
                   <img
                     src={newsletter.cover_image_url}
                     alt={`Cover for ${newsletter.name}`}
@@ -58,7 +58,7 @@ export default async function NewsletterPreview() {
                 </div>
               </div>
               <div className="text-center">
-                <h3 className="font-serif text-xl font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#C9A24B] underline-offset-4">
+                <h3 className="font-serif text-xl font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#2F5D46] underline-offset-4">
                   {newsletter.name}
                 </h3>
                 <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mb-1">

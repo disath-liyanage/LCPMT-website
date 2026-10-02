@@ -92,7 +92,7 @@ export default async function NewslettersPage({
                 <p className="text-[#2F5D46] font-bold text-sm uppercase tracking-wider mb-3">
                   {new Date(0, latest.month - 1).toLocaleString('default', { month: 'long' })} {latest.year}
                 </p>
-                <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0F2A1D] leading-tight mb-4 group-hover:underline decoration-[#C9A24B] decoration-2 underline-offset-4">
+                <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0F2A1D] leading-tight mb-4 group-hover:underline decoration-[#2F5D46] decoration-2 underline-offset-4">
                   {latest.name}
                 </h2>
                 <span className="inline-flex items-center gap-2 text-[#0F2A1D] font-semibold text-sm">
@@ -153,7 +153,7 @@ export default async function NewslettersPage({
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-12">
           {rest.map((newsletter) => (
             <Link href={`/newsletters/${newsletter.id}`} key={newsletter.id} className="group flex flex-col gap-3">
-              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#C9A24B] transition-colors duration-200 shadow-sm">
+              <div className="aspect-[3/4] relative overflow-hidden border border-[#0F2A1D]/10 group-hover:border-[#2F5D46] transition-colors duration-200 shadow-sm">
                 <img
                   src={newsletter.cover_image_url}
                   alt={`Cover for ${newsletter.name}`}
@@ -161,7 +161,7 @@ export default async function NewslettersPage({
                 />
               </div>
               <div className="px-1 text-center">
-                <h3 className="font-serif font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#C9A24B] underline-offset-4">
+                <h3 className="font-serif font-bold text-[#0F2A1D] leading-tight group-hover:underline decoration-[#2F5D46] underline-offset-4">
                   {newsletter.name}
                 </h3>
                 <p className="text-[#2F5D46] text-xs font-bold uppercase tracking-wider mt-1">
