@@ -74,27 +74,31 @@ export default function LeadershipPage() {
 
 function TeamMember({ member, index }: TeamMemberProps) {
   const [imgSrc, setImgSrc] = useState(member.image)
+  const [failed, setFailed] = useState(false)
 
   return (
     <div className="group flex flex-col items-center text-center w-36 sm:w-44 md:w-48">
-      <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full overflow-hidden mb-5 relative group-hover:-translate-y-2 transition-transform duration-300">
+      <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full overflow-hidden mb-5 relative isolate transform-gpu md:group-hover:-translate-y-2 transition-transform duration-300">
         <Image
           src={imgSrc}
           alt={member.name}
           fill
           sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, 176px"
-          priority={index < 3} 
-          className="object-cover grayscale contrast-110 group-hover:grayscale-0 transition-all duration-500"
+          priority={index < 3}
+          unoptimized={failed}
+          className="object-cover object-top md:grayscale md:group-hover:grayscale-0 transition-[filter] duration-500"
           onError={() => {
+            if (failed) return
+            setFailed(true)
             setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=FBF7ED&color=0F2A1D&size=256`)
           }}
         />
       </div>
-      
+
       <h3 className="font-serif font-bold text-[#0F2A1D] text-base md:text-lg leading-snug mb-1.5 group-hover:text-[#2F5D46] transition-colors">
         {member.name}
       </h3>
-      
+
       <p className="text-[#2F5D46]/70 text-[11px] md:text-xs font-bold uppercase tracking-wider">
         {member.role}
       </p>
