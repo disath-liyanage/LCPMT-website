@@ -12,14 +12,14 @@ export default async function NewsletterFlipbookPage({ params }: { params: Promi
     .eq('id', id)
     .single()
 
-  if (error || !newsletter) {
+  if (error || !newsletter || !Array.isArray(newsletter.page_images) || newsletter.page_images.length === 0) {
     notFound()
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex flex-col h-[100dvh] overflow-hidden">
+    <div className="fixed inset-0 z-[110] flex flex-col overflow-hidden bg-background pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)]">
       <FlipbookViewer 
-        pages={newsletter.page_images} 
+        pages={newsletter.page_images}
         title={newsletter.name}
         month={newsletter.month}
         year={newsletter.year}
