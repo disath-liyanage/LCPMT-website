@@ -20,16 +20,29 @@ export default async function NewsletterPreview() {
   return (
     <section id="newsletters" className="py-16 bg-[#FEFDF9]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-2">
-            The Panorama
-          </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#0F2A1D] mb-4">
-            Latest Newsletters
-          </h2>
-          <p className="max-w-2xl text-[#2F5D46]/80 text-sm sm:text-base">
-            Read about our latest projects, stories of creativity, leadership, and service.
-          </p>
+        <div className="flex flex-col gap-6 mb-12 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2F5D46] mb-2">
+              The Panorama
+            </p>
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#0F2A1D] mb-4">
+              Latest Newsletters
+            </h2>
+            <p className="max-w-2xl text-[#2F5D46]/80 text-sm sm:text-base">
+              Read about our latest projects, stories of creativity, leadership, and service.
+            </p>
+          </div>
+
+          <Link href="/newsletters" className="hidden md:block">
+            <OriginButton className="group flex items-center gap-2" aria-label="View Issues">
+              <span>View All Issues</span>
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1.5"
+              />
+            </OriginButton>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -56,7 +69,7 @@ export default async function NewsletterPreview() {
           ))}
         </div>
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex justify-center md:hidden">
           <Link href="/newsletters">
             <OriginButton className="group flex items-center gap-2" aria-label="View Issues">
               <span>View All Issues</span>
