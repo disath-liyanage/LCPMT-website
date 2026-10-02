@@ -67,7 +67,7 @@ export default function Contact() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-8 pt-8 border-t border-[#0F2A1D]/10">
+            <div className="flex flex-col items-center md:items-start gap-8 pt-8 border-t border-[#0F2A1D]/10 text-center md:text-left">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#2F6B4A] mb-2">
                   Email Us
@@ -85,7 +85,7 @@ export default function Contact() {
                   Call Us
                 </p>
                 <a 
-                  href="tel:+94770000000" 
+                  href="tel:+94705821820" 
                   className="font-serif text-lg md:text-xl font-medium text-[#0F2A1D] hover:text-[#2F6B4A] transition-colors"
                 >
                   +94 70 582 1820
