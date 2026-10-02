@@ -17,11 +17,14 @@ export default async function NewslettersPage({
     .order('month', { ascending: false })
     .order('name', { ascending: true })
 
-  if (resolvedSearchParams?.year) {
-    query = query.eq('year', parseInt(resolvedSearchParams.year))
+  const selectedYear = resolvedSearchParams?.year ? parseInt(resolvedSearchParams.year) : null;
+  const selectedMonth = resolvedSearchParams?.month ? parseInt(resolvedSearchParams.month) : null;
+
+  if (selectedYear) {
+    query = query.eq('year', selectedYear)
   }
-  if (resolvedSearchParams?.month) {
-    query = query.eq('month', parseInt(resolvedSearchParams.month))
+  if (selectedMonth) {
+    query = query.eq('month', selectedMonth)
   }
 
   const { data: newsletters, error } = await query
@@ -32,7 +35,14 @@ export default async function NewslettersPage({
   }
 
   const { data: allNewsletters } = await supabase.from('newsletters').select('year, month')
+  
   const years = Array.from(new Set(allNewsletters?.map(n => n.year) || [])).sort((a, b) => b - a)
+
+  const filteredForMonths = selectedYear 
+    ? allNewsletters?.filter(n => n.year === selectedYear) 
+    : allNewsletters;
+    
+  const availableMonths = Array.from(new Set(filteredForMonths?.map(n => n.month) || [])).sort((a, b) => a - b)
 
   const latest = newsletters?.[0]
   const rest = newsletters?.slice(1) ?? []
@@ -134,6 +144,7 @@ export default async function NewslettersPage({
 
           <NewsletterFilters
             years={years}
+            availableMonths={availableMonths}
             currentYear={resolvedSearchParams?.year}
             currentMonth={resolvedSearchParams?.month}
           />
