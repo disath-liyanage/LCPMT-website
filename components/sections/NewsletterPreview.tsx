@@ -33,7 +33,7 @@ export default async function NewsletterPreview() {
             </p>
           </div>
 
-          <Link href="/newsletters" className="hidden md:block">
+          <Link href="/newsletters" className="hidden md:block md:mb-10">
             <OriginButton className="group flex items-center gap-2" aria-label="View Issues">
               <span>View All Issues</span>
               <HugeiconsIcon
