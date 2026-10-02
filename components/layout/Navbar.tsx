@@ -173,7 +173,7 @@ export default function Navbar() {
             "relative h-16 w-full transition-all duration-300",
             solidBg
               ? cn(
-                  "bg-[#F5F0E8]/90 backdrop-blur-md md:bg-[#F5F0E8]/55 md:backdrop-blur-2xl md:backdrop-saturate-[180%] md:backdrop-brightness-125",
+                  "bg-[#F5F0E8]/55 backdrop-blur-2xl backdrop-saturate-[180%] backdrop-brightness-125",
                   "shadow-[0_4px_24px_rgba(0,0,0,0.10)]"
                 )
               : "bg-transparent backdrop-blur-0 shadow-none"
@@ -296,7 +296,7 @@ export default function Navbar() {
         <div
           id="mobile-menu"
           className={cn(
-            "absolute inset-x-0 top-full overflow-hidden border-t border-[#2D3F2B]/10 bg-[#F5F0E8]/95 backdrop-blur-md",
+            "absolute inset-x-0 top-full overflow-hidden border-t border-[#2D3F2B]/10 bg-[#F5F0E8]/55 backdrop-blur-2xl backdrop-saturate-[180%] backdrop-brightness-125",
             "shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-all duration-200 ease-out md:hidden",
             menuOpen ? "visible max-h-[calc(100dvh-4rem)] opacity-100" : "invisible max-h-0 opacity-0"
           )}
