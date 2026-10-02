@@ -13,7 +13,8 @@ type Props = {
 
 export default function JourneyTimeline({ title, intro, milestones }: Props) {
   const listRef = useRef<HTMLOListElement>(null);
-  const fillRef = useRef<HTMLDivElement>(null);
+  const fillRefDesktop = useRef<HTMLDivElement>(null);
+  const fillRefMobile = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [active, setActive] = useState(0);
 
@@ -27,11 +28,14 @@ export default function JourneyTimeline({ title, intro, milestones }: Props) {
 
       const trigger = window.innerHeight * 0.6; 
       const rect = list.getBoundingClientRect();
+      const scaleVal = clamp((trigger - rect.top) / rect.height);
+      const scaleTransform = `scaleY(${scaleVal})`;
 
-      if (fillRef.current) {
-        fillRef.current.style.transform = `scaleY(${clamp(
-          (trigger - rect.top) / rect.height
-        )})`;
+      if (fillRefDesktop.current) {
+        fillRefDesktop.current.style.transform = scaleTransform;
+      }
+      if (fillRefMobile.current) {
+        fillRefMobile.current.style.transform = scaleTransform;
       }
 
       let idx = 0;
@@ -74,7 +78,7 @@ export default function JourneyTimeline({ title, intro, milestones }: Props) {
           className="absolute left-1/2 top-0 hidden h-full w-0.5 -translate-x-1/2 bg-[#16241B]/10 md:block"
         >
           <div
-            ref={fillRef}
+            ref={fillRefDesktop}
             className="h-full w-full origin-top bg-[#2F6B4A]"
             style={{ transform: "scaleY(0)" }}
           />
@@ -85,8 +89,9 @@ export default function JourneyTimeline({ title, intro, milestones }: Props) {
           className="absolute left-[-2px] top-0 h-full w-[2px] bg-transparent md:hidden"
         >
           <div
+            ref={fillRefMobile}
             className="h-full w-full origin-top bg-[#2F6B4A] transition-transform duration-75"
-            style={{ transform: fillRef.current?.style.transform || "scaleY(0)" }}
+            style={{ transform: "scaleY(0)" }}
           />
         </div>
 
