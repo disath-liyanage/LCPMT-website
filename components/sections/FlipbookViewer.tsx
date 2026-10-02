@@ -29,6 +29,9 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   const flipAudioRef = useRef<HTMLAudioElement | null>(null)
   const cornerAudioRef = useRef<HTMLAudioElement | null>(null)
   const lastCornerRef = useRef(0)
+  const mountedAtRef = useRef(Date.now())
+  const lastRealMoveRef = useRef(0)
+  const lastFlipAtRef = useRef(0)
   const gesture = useRef({
     mode: "none" as GestureMode,
     sx: 0,
@@ -101,6 +104,14 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
     return () => window.removeEventListener("pointerdown", prime)
   }, [])
 
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (e.movementX !== 0 || e.movementY !== 0) lastRealMoveRef.current = Date.now()
+    }
+    window.addEventListener("mousemove", onMove)
+    return () => window.removeEventListener("mousemove", onMove)
+  }, [])
+
   const playClone = (a: HTMLAudioElement | null) => {
     if (!soundOnRef.current || !a) return
     const c = a.cloneNode() as HTMLAudioElement
@@ -108,10 +119,16 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
     c.play().catch(() => {})
   }
 
-  const playFlipSound = () => playClone(flipAudioRef.current)
+  const playFlipSound = () => {
+    lastFlipAtRef.current = Date.now()
+    playClone(flipAudioRef.current)
+  }
 
   const playCornerSound = () => {
     const now = Date.now()
+    if (now - mountedAtRef.current < 1000) return
+    if (now - lastFlipAtRef.current < 900) return
+    if (now - lastRealMoveRef.current > 150) return
     if (now - lastCornerRef.current < 600) return
     lastCornerRef.current = now
     playClone(cornerAudioRef.current)
@@ -125,6 +142,7 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   }
 
   const onPageChange = (e: any) => {
+    lastFlipAtRef.current = Date.now()
     setCurrentPage(e.data)
     if (isCompact) resetView()
   }
