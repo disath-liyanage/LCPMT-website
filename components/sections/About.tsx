@@ -58,10 +58,10 @@ export default function AboutPreview() {
             ))}
           </ul>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-x-8">
             <Link
               href="/about"
-              className="group inline-flex items-center gap-2 rounded-full bg-[#2F6B4A] px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-[#25573C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBFBF8]"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2F6B4A] px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-[#25573C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBFBF8] sm:w-auto"
             >
               Learn more about us
               <HugeiconsIcon
@@ -72,7 +72,7 @@ export default function AboutPreview() {
             </Link>
             <Link
               href="/about#journey"
-              className="text-sm font-bold text-[#16241B] underline decoration-[#2F6B4A] decoration-2 underline-offset-8 transition-colors hover:text-[#2F6B4A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16241B]"
+              className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#16241B]/15 px-8 py-4 text-sm font-bold text-[#16241B] transition-colors hover:text-[#2F6B4A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16241B] sm:w-auto sm:rounded-none sm:border-0 sm:px-0 sm:py-0 sm:underline sm:decoration-[#2F6B4A] sm:decoration-2 sm:underline-offset-8"
             >
               See our journey
             </Link>
