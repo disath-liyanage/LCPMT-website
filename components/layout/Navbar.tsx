@@ -14,12 +14,14 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navContainerRef = useRef<HTMLDivElement>(null);
 
   const isHomePage = pathname === "/";
   const showNavBg = !isHomePage || isScrolled;
+  const solidBg = showNavBg || menuOpen;
 
   useEffect(() => {
     const handleScrollBg = () => {
@@ -38,7 +40,9 @@ export default function Navbar() {
       .map((link) => (link.href.includes("#") ? link.href.split("#")[1] : null))
       .filter((id): id is string => Boolean(id));
 
-    const handleScroll = () => {
+    let ticking = false;
+
+    const compute = () => {
       let current = "hero";
       for (const id of sectionIds) {
         const el = document.getElementById(id);
@@ -49,9 +53,16 @@ export default function Navbar() {
         }
       }
       setActiveSection(current);
+      ticking = false;
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(compute);
+    };
+
+    compute();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [pathname]);
@@ -62,7 +73,7 @@ export default function Navbar() {
 
       const activeLink = navContainerRef.current.querySelector('[data-active="true"]') as HTMLElement;
 
-      if (activeLink && showNavBg) {
+      if (activeLink && activeLink.offsetWidth > 0 && showNavBg) {
         setIndicatorStyle({
           left: activeLink.offsetLeft,
           width: activeLink.offsetWidth,
@@ -84,7 +95,32 @@ export default function Navbar() {
     };
   }, [activeSection, pathname, showNavBg]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", onKey);
+    mq.addEventListener("change", onChange);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      mq.removeEventListener("change", onChange);
+    };
+  }, [menuOpen]);
+
   const handleNavClick = (e: React.MouseEvent, href: string) => {
+    setMenuOpen(false);
+
     const hashPart = href.includes("#") ? href.split("#")[1] : null;
     if (!hashPart || pathname !== "/") return;
 
@@ -95,6 +131,29 @@ export default function Navbar() {
     const y = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
+
+  const isLinkActive = (href: string, forceShow = false) => {
+    if (!showNavBg && !forceShow) return false;
+
+    const hashPart = href.includes("#") ? href.split("#")[1] : null;
+
+    if (pathname === "/") {
+      return hashPart ? activeSection === hashPart : false;
+    }
+
+    const basePath = href.split("#")[0] || "/";
+
+    if (basePath !== "/") {
+      return pathname === basePath || pathname.startsWith(`${basePath}/`);
+    }
+    if (hashPart) {
+      const routePath = `/${hashPart}`;
+      return pathname === routePath || pathname.startsWith(`${routePath}/`);
+    }
+    return false;
+  };
+
+  const visibleLinks = navLinks.filter((link) => link.label.toLowerCase() !== "join us");
 
   return (
     <>
@@ -112,9 +171,9 @@ export default function Navbar() {
           aria-label="Primary"
           className={cn(
             "relative h-16 w-full transition-all duration-300",
-            showNavBg
+            solidBg
               ? cn(
-                  "bg-[#F5F0E8]/55 backdrop-blur-2xl backdrop-saturate-[180%] backdrop-brightness-125",
+                  "bg-[#F5F0E8]/90 backdrop-blur-md md:bg-[#F5F0E8]/55 md:backdrop-blur-2xl md:backdrop-saturate-[180%] md:backdrop-brightness-125",
                   "shadow-[0_4px_24px_rgba(0,0,0,0.10)]"
                 )
               : "bg-transparent backdrop-blur-0 shadow-none"
@@ -148,40 +207,19 @@ export default function Navbar() {
 
             <div
               ref={navContainerRef}
-              className="relative flex min-w-0 flex-1 items-center justify-end gap-4 overflow-x-auto py-1.5 sm:gap-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="relative hidden min-w-0 flex-1 items-center justify-end gap-6 overflow-x-auto py-1.5 md:flex [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               <span
                 className="pointer-events-none absolute bottom-0 h-[2px] rounded-full bg-[#2D3F2B] transition-all duration-300 ease-out"
                 style={indicatorStyle}
               />
 
-              {navLinks
-                .filter((link) => link.label.toLowerCase() !== "join us")
+              {visibleLinks
                 .filter((link) => !(!showNavBg && link.label.toLowerCase() === "home"))
                 .map((link) => {
                   const hashPart = link.href.includes("#") ? link.href.split("#")[1] : null;
                   const targetId = hashPart || link.href.replace(/^\/+/, "");
-
-                  let active = false;
-
-                  if (pathname === "/") {
-                    if (hashPart) {
-                      active = activeSection === targetId;
-                    }
-                  } else {
-                    const basePath = link.href.split("#")[0] || "/";
-
-                    if (basePath !== "/") {
-                      active = pathname === basePath || pathname.startsWith(`${basePath}/`);
-                    } else if (hashPart) {
-                      const routePath = `/${hashPart}`;
-                      active = pathname === routePath || pathname.startsWith(`${routePath}/`);
-                    }
-                  }
-
-                  if (!showNavBg) {
-                    active = false;
-                  }
+                  const active = isLinkActive(link.href);
 
                   return (
                     <Link
@@ -192,10 +230,10 @@ export default function Navbar() {
                       data-target={targetId}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "relative whitespace-nowrap px-1 py-1 text-[13px] sm:text-[14px] transition-colors duration-300 antialiased",
+                        "relative whitespace-nowrap px-1 py-1 text-[14px] transition-colors duration-300 antialiased",
                         active
                           ? "text-[#2D3F2B] font-bold"
-                          : "text-[#556B52] font-semibold hover:text-[#1C2B1E] hover:font-bold"
+                          : "text-[#556B52] font-semibold hover:text-[#1C2B1E]"
                       )}
                     >
                       {link.label}
@@ -204,20 +242,88 @@ export default function Navbar() {
                 })}
             </div>
 
-            <div className="shrink-0 z-10 flex items-center pl-2">
+            <div className="z-10 ml-auto flex shrink-0 items-center gap-2 md:ml-0 md:pl-2">
               <Link href="/join" className="block">
                 <ShinyButton
                   className={cn(
                     "h-8 px-4 sm:h-9 sm:px-5 !text-[13px] sm:!text-[14px] !font-bold tracking-wide",
-                    !showNavBg && "pause-shiny"
+                    !solidBg && "pause-shiny"
                   )}
                 >
                   Join Us
                 </ShinyButton>
               </Link>
+
+              <button
+                type="button"
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                onClick={() => setMenuOpen((o) => !o)}
+                className="relative h-10 w-10 shrink-0 rounded-full transition-colors active:bg-[#2D3F2B]/10 md:hidden"
+              >
+                <span
+                  className={cn(
+                    "absolute left-1/2 top-1/2 -ml-[10px] -mt-px h-0.5 w-5 rounded-full bg-[#2D3F2B] transition-all duration-300",
+                    menuOpen ? "translate-y-0 rotate-45" : "-translate-y-[6px]"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "absolute left-1/2 top-1/2 -ml-[10px] -mt-px h-0.5 w-5 rounded-full bg-[#2D3F2B] transition-all duration-300",
+                    menuOpen && "opacity-0"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "absolute left-1/2 top-1/2 -ml-[10px] -mt-px h-0.5 w-5 rounded-full bg-[#2D3F2B] transition-all duration-300",
+                    menuOpen ? "translate-y-0 -rotate-45" : "translate-y-[6px]"
+                  )}
+                />
+              </button>
             </div>
           </div>
         </nav>
+
+        {menuOpen && (
+          <div
+            aria-hidden="true"
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-x-0 bottom-0 top-16 bg-black/25 md:hidden"
+          />
+        )}
+
+        <div
+          id="mobile-menu"
+          className={cn(
+            "absolute inset-x-0 top-full overflow-hidden border-t border-[#2D3F2B]/10 bg-[#F5F0E8]/95 backdrop-blur-md",
+            "shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-all duration-200 ease-out md:hidden",
+            menuOpen ? "visible max-h-[calc(100dvh-4rem)] opacity-100" : "invisible max-h-0 opacity-0"
+          )}
+        >
+          <ul className="mx-auto flex max-w-6xl flex-col px-3 py-2 sm:px-6">
+            {visibleLinks.map((link) => {
+              const active = isLinkActive(link.href, true);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-12 items-center rounded-lg border-l-2 px-3 text-base antialiased transition-colors",
+                      active
+                        ? "border-[#2D3F2B] bg-[#2D3F2B]/5 font-bold text-[#2D3F2B]"
+                        : "border-transparent font-semibold text-[#556B52] active:bg-[#2D3F2B]/5"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </header>
     </>
   );
