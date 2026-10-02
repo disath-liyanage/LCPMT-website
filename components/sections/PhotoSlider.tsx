@@ -10,7 +10,7 @@ export default function LogoSlider() {
     { src: "/images/leo-md.webp", alt: "Leo MD Logo" },
     { src: "/images/District-Logo.png", alt: "Leo District Logo" },
     { src: "/images/logo.svg", alt: "LCPMT Logo" },
-    { src: "/images/leosof.webp", alt: "Leos of Logo" },
+    { src: "/images/leos-of.-sri-lanka-and-malsives.webp", alt: "Leos of Sri Lanka & Maldives Logo" },
   ];
 
   return (
