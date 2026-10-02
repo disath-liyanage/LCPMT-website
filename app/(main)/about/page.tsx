@@ -4,7 +4,6 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
   ArrowUpRight01Icon,
-  ArrowRight01Icon,
   Facebook01Icon, 
   InstagramIcon, 
   TiktokIcon, 
@@ -227,12 +226,12 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mx-auto mt-10 max-w-5xl grid gap-6 md:grid-cols-2 text-center">
+          <div className="mx-auto mt-10 max-w-5xl grid grid-cols-1 gap-6 md:grid-cols-2 text-center">
             <a
               href="https://www.leomd306.org/about-us/history/lions"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex aspect-square flex-col items-center justify-between rounded-[2.5rem] bg-gradient-to-b from-[#0D4495] to-[#082F6A] p-10 transition-all duration-300 sm:p-12 md:p-16"
+              className="group relative flex aspect-auto min-h-[380px] flex-col items-center justify-between overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#0D4495] to-[#082F6A] p-8 transition-all duration-300 sm:aspect-square sm:min-h-0 sm:p-12 md:p-16"
             >
               <div>
                 <h3 className="text-3xl font-bold text-white sm:text-4xl">Lions International</h3>
@@ -250,7 +249,7 @@ export default function AboutPage() {
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-white/40 bg-transparent px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 group-hover:bg-white group-hover:text-[#082F6A]">
-                Read the history <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+                Read the history <HugeiconsIcon icon={ArrowUpRight01Icon} size={18} />
               </div>
             </a>
 
@@ -258,7 +257,7 @@ export default function AboutPage() {
               href="https://www.leomd306.org/about-us/history/leos"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex aspect-square flex-col items-center justify-between rounded-[2.5rem] bg-gradient-to-b from-[#F2F2F2] to-[#E8E8E8] p-10 transition-all duration-300 sm:p-12 md:p-16"
+              className="group relative flex aspect-auto min-h-[380px] flex-col items-center justify-between overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#F2F2F2] to-[#E8E8E8] p-8 transition-all duration-300 sm:aspect-square sm:min-h-0 sm:p-12 md:p-16"
             >
               <div>
                 <h3 className="text-3xl font-bold text-[#111827] sm:text-4xl">Leo</h3>
@@ -276,7 +275,7 @@ export default function AboutPage() {
                 />
               </div>
               <div className="flex items-center gap-2 rounded-full border border-[#111827]/10 bg-transparent px-6 py-2.5 text-sm font-bold text-[#111827] transition-all duration-300 group-hover:border-[#16241B] group-hover:bg-[#16241B] group-hover:text-white">
-                Read the story <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+                Read the story <HugeiconsIcon icon={ArrowUpRight01Icon} size={18} />
               </div>
             </a>
           </div>
@@ -284,7 +283,7 @@ export default function AboutPage() {
       </section>
 
       {milestones.length > 0 && (
-        <section id="journey" className="scroll-mt-32 bg-white py-20 lg:py-28">
+        <section id="journey" className="relative w-full scroll-mt-32 overflow-hidden bg-white py-20 sm:overflow-visible lg:py-28">
           <div className={wrap}>
             <JourneyTimeline 
               title="The journey of our club"
@@ -356,72 +355,85 @@ export default function AboutPage() {
       )}
 
       <section className="px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
-        <div className="mx-auto max-w-[90rem] overflow-hidden rounded-[3rem] border border-[#2F6B4A]/10 bg-white p-10 shadow-xl shadow-[#16241B]/[0.02] sm:p-16 lg:p-20">
-          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+        <div className="mx-auto max-w-[90rem] overflow-hidden rounded-[2rem] bg-white px-5 py-10 shadow-sm ring-1 ring-[#16241B]/5 sm:rounded-[3rem] sm:px-12 sm:py-20 lg:px-20 lg:py-24">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-20">
             
-            <div>
-              <h2 className="text-4xl font-black leading-tight tracking-tight text-[#16241B] sm:text-5xl">
+            <div className="text-center lg:text-left">
+              <h2 className="text-3xl font-black leading-tight tracking-tight text-[#16241B] sm:text-5xl lg:text-6xl">
                 Ready to make an impact?
               </h2>
-              <p className="mt-6 max-w-md text-xl leading-relaxed text-[#5F6F65]">
-                New faces are always welcome. Whether you want to join our ranks or collaborate on a cause, let's get started.
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#5F6F65] sm:mt-6 sm:text-xl lg:mx-0">
+                New faces are always welcome. Whether you want to join our ranks or collaborate on a community cause, we'd love to hear from you.
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 sm:gap-5">
               <Link
                 href="/join"
-                className="group flex items-center justify-between rounded-3xl bg-[#2F6B4A] p-6 text-white transition-colors hover:bg-[#25573C] sm:p-8"
+                className="group flex items-center justify-between gap-4 rounded-[1.5rem] bg-[#2F6B4A] p-5 transition-all duration-300 hover:scale-[1.02] hover:bg-[#25573C] hover:shadow-xl hover:shadow-[#2F6B4A]/20 sm:rounded-[2rem] sm:p-8 lg:p-10"
               >
-                <div>
-                  <span className="block text-2xl font-bold tracking-tight">Become a member</span>
-                  <span className="mt-1 block text-white/80 text-sm sm:text-base">Join the club and start serving.</span>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+                    Become a member
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-white/80 sm:mt-2 sm:text-base">
+                    Step up and start serving your community.
+                  </p>
                 </div>
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/10 transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/20">
-                  <HugeiconsIcon icon={ArrowUpRight01Icon} size={24} />
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/10 text-white transition-transform duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-[#2F6B4A] sm:h-16 sm:w-16">
+                  <HugeiconsIcon icon={ArrowUpRight01Icon} size={26} />
                 </div>
               </Link>
 
               <a
                 href={`mailto:${siteConfig.email}?subject=Partnering with the club`}
-                className="group flex items-center justify-between rounded-3xl border-2 border-[#16241B]/5 bg-[#FBFBF8] p-6 transition-colors hover:border-[#2F6B4A]/20 hover:bg-[#E8F0EB] sm:p-8"
+                className="group flex items-center justify-between gap-4 rounded-[1.5rem] bg-[#FBFBF8] p-5 shadow-sm ring-1 ring-[#16241B]/5 transition-all duration-300 hover:scale-[1.02] hover:bg-[#E8F0EB] hover:shadow-md hover:ring-[#2F6B4A]/20 sm:rounded-[2rem] sm:p-8 lg:p-10"
               >
-                <div>
-                  <span className="block text-2xl font-bold tracking-tight text-[#16241B]">Partner with us</span>
-                  <span className="mt-1 block text-[#5F6F65] text-sm sm:text-base">Bring an idea or community in need.</span>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold tracking-tight text-[#16241B] sm:text-2xl md:text-3xl">
+                    Partner with us
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-[#5F6F65] sm:mt-2 sm:text-base">
+                    Bring an idea or a community in need.
+                  </p>
                 </div>
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#16241B]/5 text-[#16241B] transition-transform duration-300 group-hover:scale-110 group-hover:bg-[#2F6B4A] group-hover:text-white">
-                  <HugeiconsIcon icon={ArrowUpRight01Icon} size={24} />
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-[#16241B] shadow-sm transition-transform duration-500 group-hover:rotate-45 group-hover:bg-[#2F6B4A] group-hover:text-white sm:h-16 sm:w-16">
+                  <HugeiconsIcon icon={ArrowUpRight01Icon} size={26} />
                 </div>
               </a>
             </div>
           </div>
 
-          <div className="mt-16 border-t border-[#16241B]/10 pt-10 sm:mt-20 sm:flex sm:items-center sm:justify-between">
-            <p className="text-lg font-bold text-[#16241B]/60">Follow our work online</p>
-            <div className="mt-6 flex flex-wrap items-center gap-4 sm:mt-0">
-              {[
-                { icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
-                { icon: Facebook01Icon, href: siteConfig.social.facebook, label: "Facebook" },
-                { icon: TiktokIcon, href: siteConfig.social.tiktok, label: "TikTok" }, 
-                { icon: YoutubeIcon, href: siteConfig.social.youtube, label: "YouTube" },
-                { icon: Linkedin01Icon, href: siteConfig.social.linkedin, label: "LinkedIn" },
-              ].map((social) => (
-                social.href && (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="grid h-12 w-12 place-items-center rounded-full bg-[#16241B]/5 text-[#16241B]/70 transition-all hover:scale-110 hover:bg-[#2F6B4A] hover:text-white"
-                  >
-                    <HugeiconsIcon icon={social.icon} size={22} />
-                  </a>
-                )
-              ))}
+          <div className="mt-10 border-t border-[#16241B]/5 pt-8 sm:mt-16 sm:pt-12">
+            <div className="flex flex-col items-center gap-5 sm:gap-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#16241B]/40">
+                Follow our journey
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {[
+                  { icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
+                  { icon: Facebook01Icon, href: siteConfig.social.facebook, label: "Facebook" },
+                  { icon: TiktokIcon, href: siteConfig.social.tiktok, label: "TikTok" }, 
+                  { icon: YoutubeIcon, href: siteConfig.social.youtube, label: "YouTube" },
+                  { icon: Linkedin01Icon, href: siteConfig.social.linkedin, label: "LinkedIn" },
+                ].map((social) => (
+                  social.href && (
+                    <a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.label}
+                      className="grid h-12 w-12 place-items-center rounded-full bg-[#16241B]/5 text-[#16241B]/60 transition-all hover:-translate-y-1 hover:bg-[#2F6B4A] hover:text-white"
+                    >
+                      <HugeiconsIcon icon={social.icon} size={22} />
+                    </a>
+                  )
+                ))}
+              </div>
             </div>
           </div>
+          
         </div>
       </section>
     </main>
