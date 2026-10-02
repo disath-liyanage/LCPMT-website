@@ -47,11 +47,11 @@ export default function AboutPreview() {
 
           <ul className="mt-10 grid max-w-lg grid-cols-3 divide-x divide-[#16241B]/10 overflow-hidden rounded-3xl border border-[#16241B]/10 bg-white shadow-sm">
             {LEO_MEANING.map(({ letter, word }) => (
-              <li key={letter} className="group px-3 py-6 text-center transition-colors hover:bg-[#FBFBF8] sm:px-4">
-                <span className="block text-4xl font-black leading-none tracking-tight text-[#2F6B4A] transition-transform duration-300 group-hover:scale-110">
+              <li key={letter} className="group px-1 py-4 text-center transition-colors hover:bg-[#FBFBF8] sm:px-4 sm:py-6">
+                <span className="block text-3xl font-black leading-none tracking-tight text-[#2F6B4A] transition-transform duration-300 group-hover:scale-110 sm:text-4xl">
                   {letter}
                 </span>
-                <span className="mt-3 block text-sm font-bold uppercase tracking-wider text-[#16241B]/60">
+                <span className="mt-2 block text-[10px] font-bold uppercase tracking-normal text-[#16241B]/60 sm:mt-3 sm:text-sm sm:tracking-wider">
                   {word}
                 </span>
               </li>
