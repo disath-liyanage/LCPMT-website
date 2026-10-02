@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import HTMLFlipBook from "react-pageflip"
-import { ChevronLeft, ZoomIn, ZoomOut, Maximize, Minimize, Redo, Undo } from "lucide-react"
+import { ChevronLeft, ZoomIn, ZoomOut, Maximize, Minimize, Redo, Undo, Volume2, VolumeX } from "lucide-react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ScreenRotationFreeIcons } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,10 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   const bookRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const areaRef = useRef<HTMLDivElement>(null)
+  const soundOnRef = useRef(true)
+  const flipAudioRef = useRef<HTMLAudioElement | null>(null)
+  const cornerAudioRef = useRef<HTMLAudioElement | null>(null)
+  const lastCornerRef = useRef(0)
   const gesture = useRef({
     mode: "none" as GestureMode,
     sx: 0,
@@ -42,20 +46,21 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [gesturing, setGesturing] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [soundOn, setSoundOn] = useState(true)
 
   const [ready, setReady] = useState(false)
   const [isCompact, setIsCompact] = useState(false)
   const [isPortrait, setIsPortrait] = useState(false)
   const [isTouch, setIsTouch] = useState(false)
   const [canFullscreen, setCanFullscreen] = useState(false)
-  const [forceRotate, setForceRotate] = useState(true)
+  const [forceRotate, setForceRotate] = useState(false)
   const [area, setArea] = useState<{ w: number; h: number } | null>(null)
 
   const totalPages = pages.length
 
-  const rotated = isCompact && isPortrait && isTouch && forceRotate
-  const singlePage = false
   const canToggleRotate = isCompact && isPortrait && isTouch
+  const rotated = canToggleRotate && forceRotate
+  const singlePage = isCompact && isPortrait && !rotated
 
   const isCoverView = currentPage === 0 || currentPage >= totalPages - 1
   const hasPrev = currentPage > 0
@@ -69,20 +74,70 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
     setPan({ x: 0, y: 0 })
   }
 
+  useEffect(() => {
+    const flip = new Audio("/sounds/turn.mp3")
+    const corner = new Audio("/sounds/corner.mp3")
+    flip.preload = corner.preload = "auto"
+    flip.volume = 0.8
+    corner.volume = 0.6
+    flipAudioRef.current = flip
+    cornerAudioRef.current = corner
+
+    const prime = () => {
+      ;[flip, corner].forEach((a) => {
+        a.muted = true
+        a.play()
+          .then(() => {
+            a.pause()
+            a.currentTime = 0
+            a.muted = false
+          })
+          .catch(() => {
+            a.muted = false
+          })
+      })
+    }
+    window.addEventListener("pointerdown", prime, { once: true })
+    return () => window.removeEventListener("pointerdown", prime)
+  }, [])
+
+  const playClone = (a: HTMLAudioElement | null) => {
+    if (!soundOnRef.current || !a) return
+    const c = a.cloneNode() as HTMLAudioElement
+    c.volume = a.volume
+    c.play().catch(() => {})
+  }
+
+  const playFlipSound = () => playClone(flipAudioRef.current)
+
+  const playCornerSound = () => {
+    const now = Date.now()
+    if (now - lastCornerRef.current < 600) return
+    lastCornerRef.current = now
+    playClone(cornerAudioRef.current)
+  }
+
+  const toggleSound = () => {
+    setSoundOn((s) => {
+      soundOnRef.current = !s
+      return !s
+    })
+  }
+
   const onPageChange = (e: any) => {
     setCurrentPage(e.data)
     if (isCompact) resetView()
+  }
+
+  const onChangeState = (e: any) => {
+    if (e.data === "flipping") playFlipSound()
+    else if (e.data === "fold_corner") playCornerSound()
   }
 
   const toggleFullScreen = async () => {
     try {
       if (!document.fullscreenElement) {
         await document.documentElement.requestFullscreen()
-        if (isCompact) {
-          try {
-            await (screen.orientation as any).lock("landscape")
-          } catch {}
-        }
       } else {
         await document.exitFullscreen()
       }
@@ -93,12 +148,10 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
 
   const handleBack = () => {
     if (document.fullscreenElement) {
-      try {
-        ;(screen.orientation as any)?.unlock?.()
-      } catch {}
       document.exitFullscreen().catch(() => {})
     }
   }
+
   const clampPan = (x: number, y: number, z: number) => {
     const mx = ((z - 1) * (area?.w ?? 0)) / 2
     const my = ((z - 1) * (area?.h ?? 0)) / 2
@@ -198,6 +251,7 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
       setIsCompact(compactMq.matches)
       setIsPortrait(portraitMq.matches)
       setIsTouch(touchMq.matches)
+      if (!portraitMq.matches) setForceRotate(false)
     }
     sync()
     setCanFullscreen(Boolean(document.fullscreenEnabled))
@@ -231,9 +285,6 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
       if (!active) {
         setZoom(1)
         setPan({ x: 0, y: 0 })
-        try {
-          ;(screen.orientation as any)?.unlock?.()
-        } catch {}
       }
       requestAnimationFrame(() => {
         setTimeout(() => bookRef.current?.pageFlip()?.update(), 50)
@@ -264,9 +315,6 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
   useEffect(() => {
     return () => {
       if (document.fullscreenElement) {
-        try {
-          ;(screen.orientation as any)?.unlock?.()
-        } catch {}
         document.exitFullscreen().catch(() => {})
       }
     }
@@ -395,6 +443,16 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
             </>
           )}
 
+          <Button
+            variant="frosted-pill"
+            size="icon"
+            aria-label={soundOn ? "Mute page sound" : "Unmute page sound"}
+            className={cn("rounded-full text-[#0F2A1D]", isCompact && "size-11")}
+            onClick={toggleSound}
+          >
+            {soundOn ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+          </Button>
+
           {canFullscreen && (
             <Button
               variant="frosted-pill"
@@ -451,8 +509,10 @@ export default function FlipbookViewer({ pages, title, month, year }: FlipbookVi
                   showCover={true}
                   usePortrait={singlePage}
                   useMouseEvents={!isCompact}
+                  showPageCorners={true}
                   drawShadow={true}
                   onFlip={onPageChange}
+                  onChangeState={onChangeState}
                   ref={bookRef}
                 >
                   {pages.map((url, i) => {
